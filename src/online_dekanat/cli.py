@@ -18,7 +18,7 @@ def main() -> None:
     process.add_argument("--file", required=True, help="Path to JPG, PNG, PDF, or TXT in text OCR mode.")
     process.add_argument("--question", required=True, help="Student question in Russian.")
     process.add_argument("--doc-type", default=None, help="Optional document type id.")
-    process.add_argument("--ocr", default="auto", choices=["auto", "qwen", "tesseract", "text"], help="OCR engine; auto selects the available local backend.")
+    process.add_argument("--ocr", default="auto", choices=["auto", "tesseract", "easyocr", "paddleocr", "text"], help="OCR engine; auto selects the available local backend.")
     process.add_argument("--out", default=None, help="Optional JSON output path.")
 
     serve = subparsers.add_parser("serve", help="Start FastAPI server.")
