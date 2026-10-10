@@ -1,0 +1,29 @@
+[
+  {
+    "id": "3.2",
+    "title": "Справка об обучении для перевода",
+    "doc_type": "study_certificate",
+    "intent_keywords": ["перевод", "2 курс", "второй курс", "обучении", "достаточно", "хватит"],
+    "required_fields": ["student_name", "university", "program", "study_form", "study_period", "issue_number_date", "signature_and_seal"],
+    "success": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "missing": "Не хватает: {missing}. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата."
+  },
+  {
+    "id": "4.1",
+    "title": "Заявление на академический отпуск",
+    "doc_type": "academic_leave_application",
+    "intent_keywords": ["академический отпуск", "отпуск", "заявление", "оформить"],
+    "required_fields": ["student_name", "group_course", "leave_reason", "leave_start", "leave_end", "application_date", "student_signature"],
+    "success": "Заявление содержит все данные, которые требует п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "missing": "Не хватает: {missing}. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата."
+  },
+  {
+    "id": "5.3",
+    "title": "Справка о практике",
+    "doc_type": "practice_certificate",
+    "intent_keywords": ["практика", "зачесть", "справка о практике", "принять"],
+    "required_fields": ["student_name", "organization", "practice_period", "supervisor", "grade", "issue_number_date", "signature_and_seal"],
+    "success": "Справка о практике содержит все данные, которые требует п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "missing": "Не хватает: {missing}. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата."
+  }
+]

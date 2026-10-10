@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "online-dekanat"
+version = "0.1.0"
+description = "OCR + field extraction + grounded answers for a digital dean office assistant."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Hackathon team" }]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "pydantic>=2.7",
+  "pillow>=10.0",
+  "pymupdf>=1.24",
+  "cryptography>=43.0"
+]
+
+[project.optional-dependencies]
+qwen = [
+  "accelerate>=0.33",
+  "safetensors>=0.4",
+  "torch>=2.6",
+  "torchvision>=0.21",
+  "transformers>=4.49.0",
+  "qwen-vl-utils>=0.0.8"
+]
+tesseract = ["pytesseract>=0.3.13"]
+dataset = ["datasets>=2.20"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+online-dekanat = "online_dekanat.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
