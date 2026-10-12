@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from online_dekanat.io import load_pages
-from online_dekanat.ocr.base import OCRResult
+from online_dekanat.ocr.base import OCRRegion, OCRResult
 
 
 class PaddleOCRClient:
@@ -23,9 +23,12 @@ class PaddleOCRClient:
         if self._engine is None:
             self._engine = self._create_engine(PaddleOCR)
         texts: list[str] = []
-        for page in load_pages(file_path):
-            texts.append(self._recognize_page(page))
-        return OCRResult(text="\n\n".join(texts).strip(), engine="paddleocr", pages=len(texts))
+        regions: list[OCRRegion] = []
+        for page_index, page in enumerate(load_pages(file_path)):
+            page_text, page_regions = self._recognize_page(page, page_index)
+            texts.append(page_text)
+            regions.extend(page_regions)
+        return OCRResult(text="\n\n".join(texts).strip(), engine="paddleocr", pages=len(texts), regions=regions)
 
     def _create_engine(self, paddle_ocr: Any) -> Any:
         attempts = [
@@ -41,7 +44,7 @@ class PaddleOCRClient:
                 last_error = exc
         raise RuntimeError(f"PaddleOCR could not be initialized: {last_error}") from last_error
 
-    def _recognize_page(self, page: Any) -> str:
+    def _recognize_page(self, page: Any, page_index: int = 0) -> tuple[str, list[OCRRegion]]:
         import numpy as np
 
         image = np.asarray(page)
@@ -50,13 +53,14 @@ class PaddleOCRClient:
                 result = self._engine.predict(input=image)
             except TypeError:
                 result = self._engine.predict(image)
-            return _extract_predict_text(result)
+            return _extract_predict_text(result, page_index)
         result = self._engine.ocr(image, cls=True)
-        return _extract_legacy_text(result)
+        return _extract_legacy_text(result, page_index)
 
 
-def _extract_predict_text(result: Any) -> str:
+def _extract_predict_text(result: Any, page_index: int = 0) -> tuple[str, list[OCRRegion]]:
     lines: list[str] = []
+    regions: list[OCRRegion] = []
     for item in result or []:
         data = getattr(item, "json", None)
         if callable(data):
@@ -67,12 +71,21 @@ def _extract_predict_text(result: Any) -> str:
         if isinstance(data, dict):
             data = data.get("res", data)
             texts = data.get("rec_texts", []) if isinstance(data, dict) else []
-            lines.extend(str(text).strip() for text in texts if str(text).strip())
-    return "\n".join(lines)
+            boxes = data.get("rec_boxes", []) if isinstance(data, dict) else []
+            for index, text in enumerate(texts):
+                value = str(text).strip()
+                if not value:
+                    continue
+                lines.append(value)
+                if index < len(boxes):
+                    box = boxes[index]
+                    regions.append(OCRRegion(value, (float(box[0]), float(box[1]), float(box[2]), float(box[3])), page_index))
+    return "\n".join(lines), regions
 
 
-def _extract_legacy_text(result: Any) -> str:
+def _extract_legacy_text(result: Any, page_index: int = 0) -> tuple[str, list[OCRRegion]]:
     lines: list[str] = []
+    regions: list[OCRRegion] = []
     for page in result or []:
         for row in page or []:
             if isinstance(row, (list, tuple)) and len(row) >= 2:
@@ -81,4 +94,9 @@ def _extract_legacy_text(result: Any) -> str:
                     text = str(value[0]).strip()
                     if text:
                         lines.append(text)
-    return "\n".join(lines)
+                        box = row[0] if row else []
+                        if box:
+                            xs = [point[0] for point in box]
+                            ys = [point[1] for point in box]
+                            regions.append(OCRRegion(text, (min(xs), min(ys), max(xs), max(ys)), page_index, float(value[1]) if len(value) > 1 else None))
+    return "\n".join(lines), regions

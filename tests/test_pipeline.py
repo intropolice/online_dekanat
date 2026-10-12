@@ -41,7 +41,8 @@ def test_pipeline_reports_missing_seal() -> None:
     finally:
         sample.unlink(missing_ok=True)
 
-    assert "Подпись и печать" in result.answer.missing_fields
+    assert "Подпись" in result.answer.missing_fields
+    assert "Печать" in result.answer.missing_fields
     assert "Не хватает" in result.answer.text
 
 

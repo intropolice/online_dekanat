@@ -13,6 +13,7 @@ class FieldValue:
     value: str = NOT_FOUND
     required: bool = True
     source: str = "document"
+    confidence: float | None = None
 
     @property
     def is_found(self) -> bool:
@@ -47,6 +48,10 @@ class Answer:
 class PipelineResult:
     card: DocumentCard
     answer: Answer
+    quality: dict[str, Any] = field(default_factory=dict)
+    highlights: list[str] = field(default_factory=list)
+    result_id: str | None = None
+    processed_at: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

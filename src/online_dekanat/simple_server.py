@@ -11,6 +11,7 @@ from urllib.parse import parse_qs
 from online_dekanat.pipeline import DeanOfficePipeline
 from online_dekanat.ui import UI_HTML
 from online_dekanat.secure_storage import EncryptedStorage
+from online_dekanat.database import StudentDatabase
 
 
 class DeanOfficeHandler(BaseHTTPRequestHandler):
@@ -22,6 +23,25 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
             return
         if self.path == "/health":
             self._send_json({"status": "ok", "server": "simple"})
+            return
+        if self.path.startswith("/highlights/"):
+            root = Path("data/highlights").resolve()
+            path = (root / self.path.removeprefix("/highlights/")).resolve()
+            if path.parent == root and path.is_file():
+                self._send_bytes(path.read_bytes(), "image/png")
+                return
+            self._send_json({"error": "highlight not found"}, status=HTTPStatus.NOT_FOUND)
+            return
+        if self.path == "/students":
+            self._send_json(StudentDatabase().list_students())
+            return
+        if self.path.startswith("/students/") and self.path.endswith("/documents"):
+            try:
+                student_id = int(self.path.split("/")[2])
+            except (IndexError, ValueError):
+                self._send_json({"error": "invalid student id"}, status=HTTPStatus.BAD_REQUEST)
+                return
+            self._send_json(StudentDatabase().list_documents(student_id))
             return
         self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -84,7 +104,9 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def _send_text(self, text: str, content_type: str) -> None:
-        data = text.encode("utf-8")
+        self._send_bytes(text.encode("utf-8"), content_type)
+
+    def _send_bytes(self, data: bytes, content_type: str) -> None:
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))

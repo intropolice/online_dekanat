@@ -8,5 +8,4 @@ __pycache__/
 *.egg-info/
 data/
 output/
-results.json
 server.log

@@ -4,12 +4,15 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse
 
 from online_dekanat.pipeline import DeanOfficePipeline
 from online_dekanat.ui import UI_HTML
 from online_dekanat.secure_storage import EncryptedStorage
+from online_dekanat.database import StudentDatabase
 
 app = FastAPI(title="Онлайн-деканат", version="0.1.0")
+_database = StudentDatabase()
 
 
 @app.get("/health")
@@ -36,6 +39,25 @@ async def process_document(
     finally:
         if tmp_path is not None:
             tmp_path.unlink(missing_ok=True)
+
+
+@app.get("/highlights/{filename}")
+def highlight(filename: str) -> FileResponse:
+    root = Path("data/highlights").resolve()
+    path = (root / filename).resolve()
+    if path.parent != root or not path.is_file():
+        return JSONResponse({"error": "highlight not found"}, status_code=404)
+    return FileResponse(path, media_type="image/png")
+
+
+@app.get("/students")
+def students() -> list[dict]:
+    return _database.list_students()
+
+
+@app.get("/students/{student_id}/documents")
+def student_documents(student_id: int) -> list[dict]:
+    return _database.list_documents(student_id)
 
 
 @app.get("/ui", response_class=HTMLResponse)
