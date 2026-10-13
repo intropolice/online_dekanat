@@ -1,6 +1,24 @@
 from pathlib import Path
 
+from online_dekanat.answering import answer_question
+from online_dekanat.config import load_regulations
+from online_dekanat.models import DocumentCard
 from online_dekanat.pipeline import DeanOfficePipeline
+
+
+def test_selects_regulation_by_document_type_without_intent_keyword() -> None:
+    regulations = load_regulations()
+    cases = [
+        ("study_certificate", "3.2"),
+        ("academic_leave_application", "4.1"),
+        ("practice_certificate", "5.3"),
+    ]
+
+    for doc_type, provision in cases:
+        card = DocumentCard(doc_type=doc_type, doc_label="", fields={}, raw_text="")
+        answer = answer_question("Проверьте загруженный документ", card, regulations)
+
+        assert f"п. {provision} Положения" in answer.text
 
 
 def test_pipeline_answers_success_for_complete_study_certificate() -> None:

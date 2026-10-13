@@ -963,5 +963,1733 @@
         }
       ]
     }
+  },
+  {
+    "result_id": "417c4950ba5b948272b5",
+    "processed_at": "2026-10-13T14:58:16.836168+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1132,
+          "height": 1600,
+          "brightness": 251.35,
+          "contrast": 25.05,
+          "sharpness": 1407.74
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "9f249a624869fcc2c628",
+    "processed_at": "2026-10-13T14:59:07.480738+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d4874b1e739cecf754d2",
+    "processed_at": "2026-10-13T14:59:58.948851+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "bd3f9e7ff3f42577bf0a",
+    "processed_at": "2026-10-13T15:00:04.500353+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Дата выдачи. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата выдачи"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.08,
+          "contrast": 26.62,
+          "sharpness": 1178.57
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "16c05659dd95165ff8cf",
+    "processed_at": "2026-10-13T15:00:19.872329+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.5,
+          "contrast": 25.12,
+          "sharpness": 1081.21
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "981f5527b0142baa0d34",
+    "processed_at": "2026-10-13T15:01:16.455940+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: ФИО студента, Название вуза, Направление подготовки, Форма обучения, Начало периода обучения, Окончание периода обучения, Номер выдачи, Дата выдачи, Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "ФИО студента",
+      "Название вуза",
+      "Направление подготовки",
+      "Форма обучения",
+      "Начало периода обучения",
+      "Окончание периода обучения",
+      "Номер выдачи",
+      "Дата выдачи",
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "warning",
+      "score": 0.6,
+      "issues": [
+        "low_resolution",
+        "too_dark"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 220,
+          "height": 220,
+          "brightness": 37.62,
+          "contrast": 37.01,
+          "sharpness": 134.91
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "6712350a87de6266f7c7",
+    "processed_at": "2026-10-13T15:01:41.379393+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: ФИО студента, Название вуза, Направление подготовки, Форма обучения, Начало периода обучения, Окончание периода обучения, Номер выдачи, Дата выдачи, Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "ФИО студента",
+      "Название вуза",
+      "Направление подготовки",
+      "Форма обучения",
+      "Начало периода обучения",
+      "Окончание периода обучения",
+      "Номер выдачи",
+      "Дата выдачи",
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "warning",
+      "score": 0.6,
+      "issues": [
+        "low_resolution",
+        "too_dark"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 220,
+          "height": 220,
+          "brightness": 37.62,
+          "contrast": 37.01,
+          "sharpness": 134.91
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "f5784c86d68c4645485d",
+    "processed_at": "2026-10-13T15:02:50.048779+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.63,
+          "sharpness": 1108.99
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "fc3dbfadef93be2e60e7",
+    "processed_at": "2026-10-13T15:03:33.636896+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.41,
+          "contrast": 25.4,
+          "sharpness": 1095.19
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "40240a5e49f87e76cf8b",
+    "processed_at": "2026-10-13T15:04:01.997352+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.51,
+          "sharpness": 958.73
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "0210a579466043f9ca12",
+    "processed_at": "2026-10-13T15:21:54.706910+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "bbe99ba3e61d127674d1",
+    "processed_at": "2026-10-13T15:21:54.813713+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "07e9de83739c11752c93",
+    "processed_at": "2026-10-13T15:21:54.902934+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "22f7e86620c844815d45",
+    "processed_at": "2026-10-13T15:22:43.964356+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "8176b73cc657f68c173d",
+    "processed_at": "2026-10-13T15:22:44.040801+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "80be8f96ac5a1e233582",
+    "processed_at": "2026-10-13T15:22:44.114798+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "c9c7af30b1f3c191917b",
+    "processed_at": "2026-10-13T15:37:18.824116+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "a4553f493686eeba3a43",
+    "processed_at": "2026-10-13T15:38:04.545248+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "bee6fb777c984579b165",
+    "processed_at": "2026-10-13T15:38:12.757509+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "7558361faf2a93dae71a",
+    "processed_at": "2026-10-13T15:42:18.020846+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "65c8c3e4c5298145d2ac",
+    "processed_at": "2026-10-13T15:42:18.122482+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "5ad843bd260041c8bf9c",
+    "processed_at": "2026-10-13T15:42:18.296213+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "d5e3226903911e237ec0",
+    "processed_at": "2026-10-13T15:44:02.987311+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата заявления, Подпись студента. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата заявления",
+      "Подпись студента"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "9c8965475d168a571d93",
+    "processed_at": "2026-10-13T15:48:03.332580+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата заявления, Подпись студента. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата заявления",
+      "Подпись студента"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "2059ee06cbca5efd61db",
+    "processed_at": "2026-10-13T15:48:21.999646+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c6adcd4f07b91b19ae78",
+    "processed_at": "2026-10-13T15:48:39.864718+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Сроки практики, Руководитель практики, Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Сроки практики",
+      "Руководитель практики",
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "5445d73821960370eebb",
+    "processed_at": "2026-10-13T15:51:02.373932+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "4fbb610e72377be67bc7",
+    "processed_at": "2026-10-13T15:51:03.002210+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "d6e512c86e1a8c323bbe",
+    "processed_at": "2026-10-13T15:51:03.706672+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "31484c5aac87eee416d9",
+    "processed_at": "2026-10-13T15:51:54.634654+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "767f6f3473e3535981c7",
+    "processed_at": "2026-10-13T15:53:52.551005+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "65c9836cb631e32323a0",
+    "processed_at": "2026-10-13T15:53:53.222317+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "f685d0dbe6866e0ea33f",
+    "processed_at": "2026-10-13T15:53:53.742102+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "a380bb7a9bfb9c4613b8",
+    "processed_at": "2026-10-13T15:55:02.824628+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "ff4809a6ae180a19bdc5",
+    "processed_at": "2026-10-13T15:56:00.609344+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "1f924e3cc3d1e8a292e6",
+    "processed_at": "2026-10-13T15:56:42.749037+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.79,
+          "sharpness": 1056.1
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "b602bfc8f67f13bf51ed",
+    "processed_at": "2026-10-13T15:56:56.283412+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "dab55d3fd36d63f0dfc9",
+    "processed_at": "2026-10-13T15:59:48.897030+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "1e1ebb91684803d88d3f",
+    "processed_at": "2026-10-13T15:59:48.974232+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "801e99087b1cc7ba45c0",
+    "processed_at": "2026-10-13T15:59:49.040201+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "ec1c5d6f19eeb526ab7e",
+    "processed_at": "2026-10-13T16:07:31.355242+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "9fb0ee66f4eca35c4468",
+    "processed_at": "2026-10-13T16:07:52.442016+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "25552211d47a4e49606b",
+    "processed_at": "2026-10-13T16:10:51.097585+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "10f4c4a863be7098e22d",
+    "processed_at": "2026-10-13T16:10:51.192147+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "847624aba62c341101bb",
+    "processed_at": "2026-10-13T16:10:51.348835+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "cd6d493dbcc12a04c6b8",
+    "processed_at": "2026-10-13T16:12:49.957623+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "8574cf45997f0a63e5d4",
+    "processed_at": "2026-10-13T16:14:51.313878+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "0abf866638a1f1394f26",
+    "processed_at": "2026-10-13T16:14:51.525847+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "e349b689782045f8ff78",
+    "processed_at": "2026-10-13T16:14:51.616746+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "c9d6e68f919a41b48901",
+    "processed_at": "2026-10-13T16:15:08.373819+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "dbff9cbc32f3f2a8abd5",
+    "processed_at": "2026-10-13T16:15:08.887065+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "66380541709e69bbef62",
+    "processed_at": "2026-10-13T16:15:09.381192+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "a0623765e1cec1a919ec",
+    "processed_at": "2026-10-13T16:15:36.957999+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "196b451f7d48afce4dfa",
+    "processed_at": "2026-10-13T16:15:37.076005+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "76fcaddec83866442f05",
+    "processed_at": "2026-10-13T16:15:37.231525+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "333526504ff451897c1e",
+    "processed_at": "2026-10-13T16:18:56.222892+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "a6a8c962e390a49600ce",
+    "processed_at": "2026-10-13T16:20:07.500272+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "501053d633639cc99ecc",
+    "processed_at": "2026-10-13T16:20:59.300979+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата начала отпуска, Дата окончания отпуска, Дата заявления. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата начала отпуска",
+      "Дата окончания отпуска",
+      "Дата заявления"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.86,
+          "sharpness": 981.03
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "0214ef82cb98c2205937",
+    "processed_at": "2026-10-13T16:21:28.738797+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Справка о практике содержит все данные, которые требует п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.44,
+          "sharpness": 1106.61
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "071635a9ce1de60c12bb",
+    "processed_at": "2026-10-13T16:22:29.783537+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата начала отпуска, Дата окончания отпуска, Дата заявления. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата начала отпуска",
+      "Дата окончания отпуска",
+      "Дата заявления"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.86,
+          "sharpness": 981.03
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "b0c004b873bb28343b3b",
+    "processed_at": "2026-10-13T16:31:09.933469+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "3f362af6e44a6d7b2730",
+    "processed_at": "2026-10-13T16:33:23.376518+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "efdfe795a96cfc741658",
+    "processed_at": "2026-10-13T16:33:23.882601+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "96a010afad710dab9ec7",
+    "processed_at": "2026-10-13T16:33:24.638543+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "c8f0e3c608d5077db3b0",
+    "processed_at": "2026-10-13T16:36:18.243114+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "9c4a21b90f5e9d4f189f",
+    "processed_at": "2026-10-13T16:36:18.839422+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "9e36ce3d469692df369f",
+    "processed_at": "2026-10-13T16:36:19.529837+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "09296641a52b378a5d76",
+    "processed_at": "2026-10-13T16:37:01.386289+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "30b80cd602796d445901",
+    "processed_at": "2026-10-13T16:37:01.898884+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "d7137ebb05d0c4e73e2e",
+    "processed_at": "2026-10-13T16:37:02.051238+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "b056b6a2bd091af7325a",
+    "processed_at": "2026-10-13T16:37:11.904388+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "977e7b7413bf48606dd4",
+    "processed_at": "2026-10-13T16:37:12.077195+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "ebe6680c4e8fbe623170",
+    "processed_at": "2026-10-13T16:37:12.233955+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "529df308875ee2ae3eae",
+    "processed_at": "2026-10-13T16:45:16.618205+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "529944bc838d74d48187",
+    "processed_at": "2026-10-13T16:45:25.272749+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Заявление содержит все данные, которые требует п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.86,
+          "sharpness": 981.03
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "e9d2ee964ab608f71987",
+    "processed_at": "2026-10-13T16:45:39.351481+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d61c534fe9276699229d",
+    "processed_at": "2026-10-13T16:45:52.389294+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "Справка о практике содержит все данные, которые требует п. 5.3 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.54,
+          "contrast": 24.95,
+          "sharpness": 1077.06
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "7a3c7d93f4bb2bdd1bd9",
+    "processed_at": "2026-10-13T16:51:44.705009+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "1b41f394bf863c367efb",
+    "processed_at": "2026-10-13T16:52:07.302649+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "aecd0acefc5b7f98f197",
+    "processed_at": "2026-10-13T16:52:07.757598+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Не хватает: Подпись, Печать. Эти поля обязательны по п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись",
+      "Печать"
+    ],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
+  },
+  {
+    "result_id": "28051422ca67edc29bca",
+    "processed_at": "2026-10-13T16:52:07.908267+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет информации по этому вопросу. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "not_applicable",
+      "score": 1.0,
+      "issues": [],
+      "pages": 1
+    }
   }
 ]
