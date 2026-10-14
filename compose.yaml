@@ -2,19 +2,32 @@ services:
   web:
     build:
       context: .
+      args:
+        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-mirror.gcr.io/library/python:3.11-slim-bookworm}
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR:-http://mirror.yandex.ru/debian}
+        DEBIAN_SECURITY_MIRROR: ${DEBIAN_SECURITY_MIRROR:-http://mirror.yandex.ru/debian-security}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
     image: online-dekanat:local
     ports:
       - "${ONLINE_DEKANAT_PORT:-8000}:8000"
     environment:
       ONLINE_DEKANAT_STORAGE_KEY: ${ONLINE_DEKANAT_STORAGE_KEY:-}
+      ONLINE_DEKANAT_RESULTS_PATH: /app/data/results.json
+      ONLINE_DEKANAT_HTTPS_ONLY: ${ONLINE_DEKANAT_HTTPS_ONLY:-false}
+      BREVO_API_KEY: ${BREVO_API_KEY:-}
+      BREVO_SENDER_EMAIL: ${BREVO_SENDER_EMAIL:-}
+      BREVO_SENDER_NAME: ${BREVO_SENDER_NAME:-Онлайн-деканат}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      SMTP_SSL: ${SMTP_SSL:-false}
+      SMTP_TIMEOUT_SECONDS: ${SMTP_TIMEOUT_SECONDS:-15}
     volumes:
       - app_data:/app/data
-      - ./results.json:/app/results.json
-      - paddle_models:/home/app/.paddle
-      - paddlex_models:/home/app/.paddlex
-      - paddleocr_models:/home/app/.paddleocr
-      - easyocr_models:/home/app/.EasyOCR
-      - torch_cache:/home/app/.cache/torch
+      - ./results.json:/app/data/results.json
     init: true
     restart: unless-stopped
     healthcheck:
@@ -22,7 +35,7 @@ services:
         - CMD
         - python
         - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
       interval: 30s
       timeout: 5s
       retries: 3
@@ -30,8 +43,3 @@ services:
 
 volumes:
   app_data:
-  paddle_models:
-  paddlex_models:
-  paddleocr_models:
-  easyocr_models:
-  torch_cache:

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import re
-from difflib import SequenceMatcher
 from datetime import datetime
+from difflib import SequenceMatcher
 from typing import Any
 
 from online_dekanat.models import NOT_FOUND, DocumentCard, FieldValue
+
+DATE_PATTERN = r"(?<!\d)(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})(?!\d)"
 
 
 def classify_document(text: str, document_types: dict[str, Any]) -> str:
@@ -40,15 +42,15 @@ def _extract_field(key: str, spec: dict[str, Any], text: str) -> FieldValue:
     kind = spec.get("kind", "regex")
     if kind == "presence":
         value = _extract_presence(spec, text)
+    elif kind == "group":
+        value = _extract_group(text)
     elif kind == "date_period_part":
         value = _extract_date_period_part(spec.get("part", "start"), text)
-    elif kind == "labeled_date":
-        value = _extract_labeled_date(spec.get("labels", []), text)
-        if value == NOT_FOUND:
-            value = _extract_regex(spec.get("patterns", []), text)
+    elif kind == "date":
+        value = _extract_labeled_date(spec, text)
     else:
         value = _extract_regex(spec.get("patterns", []), text)
-    if key.endswith(("_date", "_start", "_end")) and value != NOT_FOUND:
+    if key == "issue_date" and value != NOT_FOUND:
         value = _normalize_date(value) or value
     return FieldValue(
         key=key,
@@ -58,27 +60,48 @@ def _extract_field(key: str, spec: dict[str, Any], text: str) -> FieldValue:
     )
 
 
+def _extract_group(text: str) -> str:
+    lines = text.splitlines()
+    label = re.compile(
+        r"^[ \t]*(?:учебная[ \t]+)?группа(?:[ \t]+и[ \t]+курс)?"
+        r"(?:[ \t]*[:：][ \t]*(.*)|[ \t]+(.+))?[ \t]*$",
+        flags=re.IGNORECASE,
+    )
+    group_code = re.compile(r"[a-zа-яё]{2,}[ -]?\d+(?:[-/][a-zа-яё0-9]+)*", flags=re.IGNORECASE)
+    for index, line in enumerate(lines):
+        match = label.search(line)
+        if not match:
+            continue
+        value = (match.group(1) or match.group(2) or "").strip(" .:;\t\r\n")
+        if value:
+            return value
+        if index + 1 < len(lines):
+            next_line = lines[index + 1].strip()
+            if group_code.fullmatch(next_line):
+                return next_line
+    return NOT_FOUND
+
+
 def _extract_date_period_part(part: str, text: str) -> str:
-    date_pattern = r"(?<!\d)(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})"
     lines = text.splitlines()
     explicit = "начало периода обучения" if part == "start" else "окончание периода обучения"
     for line in lines:
         normalized_line = line.casefold()
-        dates = re.findall(date_pattern, line)
+        dates = re.findall(DATE_PATTERN, line, flags=re.IGNORECASE)
         if explicit in normalized_line and dates:
             return _normalize_date(dates[0 if part == "start" else -1]) or NOT_FOUND
     for line in lines:
         normalized_line = line.casefold()
         if "период обучения" not in normalized_line and "срок обучения" not in normalized_line:
             continue
-        dates = re.findall(date_pattern, line)
+        dates = re.findall(DATE_PATTERN, line, flags=re.IGNORECASE)
         if len(dates) >= 2:
             return _normalize_date(dates[0 if part == "start" else 1]) or NOT_FOUND
         if dates and re.search(r"\b(?:с|до|по)\b", normalized_line):
             # A one-date line is handled below if the start/end marker is explicit.
             continue
     for line in lines:
-        date_matches = list(re.finditer(date_pattern, line))
+        date_matches = list(re.finditer(DATE_PATTERN, line, flags=re.IGNORECASE))
         markers = list(re.finditer(r"\b(с|до|по)\b", line, flags=re.IGNORECASE))
         for date_match in date_matches:
             previous_markers = [marker for marker in markers if marker.start() < date_match.start()]
@@ -90,34 +113,37 @@ def _extract_date_period_part(part: str, text: str) -> str:
     return NOT_FOUND
 
 
-def _extract_labeled_date(labels: list[str], text: str) -> str:
-    date_pattern = r"(?<!\d)(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})"
-    aliases = [
-        (label.casefold(), re.findall(r"[a-zа-яё0-9]+", label.casefold()))
-        for label in labels
-    ]
-    candidates: list[tuple[float, str]] = []
+def _extract_labeled_date(spec: dict[str, Any], text: str) -> str:
+    dates: list[tuple[str, str]] = []
     for line in text.splitlines():
-        for date_match in re.finditer(date_pattern, line, flags=re.IGNORECASE):
-            normalized_date = _normalize_date(date_match.group(1))
-            if normalized_date is None:
-                continue
-            prefix = line[: date_match.start(1)].casefold()
-            prefix_tokens = re.findall(r"[a-zа-яё0-9]+", prefix)
-            for alias, alias_tokens in aliases:
-                if alias in prefix:
-                    candidates.append((1.0, normalized_date))
-                    continue
-                if len(prefix_tokens) < len(alias_tokens):
-                    continue
-                label_text = " ".join(prefix_tokens[-len(alias_tokens) :])
-                expected = " ".join(alias_tokens)
-                similarity = SequenceMatcher(None, label_text, expected).ratio()
-                if similarity >= 0.78:
-                    candidates.append((similarity, normalized_date))
-    if not candidates:
-        return NOT_FOUND
-    return max(candidates, key=lambda candidate: candidate[0])[1]
+        matches = list(re.finditer(DATE_PATTERN, line, flags=re.IGNORECASE))
+        if not matches:
+            continue
+        dates.extend((match.group(1), line[: match.start()]) for match in matches)
+        labels = spec.get("labels", [])
+        if any(_date_label_matches(line[: matches[0].start()], label) for label in labels):
+            return _normalize_date(matches[0].group(1)) or NOT_FOUND
+
+    date_index = spec.get("date_index")
+    if isinstance(date_index, int) and 0 <= date_index < len(dates):
+        return _normalize_date(dates[date_index][0]) or NOT_FOUND
+    return NOT_FOUND
+
+
+def _date_label_matches(line_prefix: str, label: str) -> bool:
+    tokens = re.findall(r"[а-яё]+", line_prefix.casefold())
+    expected = re.findall(r"[а-яё]+", label.casefold())
+    if not expected or len(tokens) < len(expected):
+        return False
+    best_score = 0.0
+    for start in range(len(tokens) - len(expected) + 1):
+        similarities = [
+            SequenceMatcher(None, actual, target).ratio()
+            for actual, target in zip(tokens[start : start + len(expected)], expected)
+        ]
+        if min(similarities) >= 0.65:
+            best_score = max(best_score, sum(similarities) / len(similarities))
+    return best_score >= 0.78
 
 
 def _normalize_date(value: str) -> str | None:
@@ -141,13 +167,12 @@ def _normalize_date(value: str) -> str | None:
 
 def _extract_regex(patterns: list[str], text: str) -> str:
     for pattern in patterns:
-        for line in text.splitlines():
-            match = re.search(pattern, line, flags=re.IGNORECASE)
-            if match:
-                groups = [group.strip(" .:;\t\r\n") for group in match.groups() if group]
-                if groups:
-                    return " от ".join(groups) if len(groups) == 2 else " ".join(groups)
-                return match.group(0).strip()
+        match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE)
+        if match:
+            groups = [group.strip(" .:;\t\r\n") for group in match.groups() if group]
+            if groups:
+                return " от ".join(groups) if len(groups) == 2 else " ".join(groups)
+            return match.group(0).strip()
     return NOT_FOUND
 
 

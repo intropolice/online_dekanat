@@ -17,15 +17,23 @@ def append_result(payload: dict[str, Any], path: str | Path | None = None) -> No
     except (OSError, json.JSONDecodeError):
         records = []
     records.append(payload)
-    fd, temporary = tempfile.mkstemp(prefix="results-", suffix=".json", dir=target.parent)
+    
+    # ИСПРАВЛЕНИЕ: Используем системную папку /tmp для создания временного файла,
+    # чтобы у Docker не возникало ошибки Permission Denied при записи в корень /app
+    fd, temporary = tempfile.mkstemp(prefix="results-", suffix=".json", dir=None)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as file:
             json.dump(records, file, ensure_ascii=False, indent=2)
             file.write("\n")
-        os.replace(temporary, target)
+        
+        # Переносим готовый файл на его законное место
+        try:
+            os.replace(temporary, target)
+        except OSError:
+            # На случай, если /tmp и target на разных файловых системах внутри Docker
+            Path(target).write_text(Path(temporary).read_text(encoding="utf-8"), encoding="utf-8")
     finally:
         Path(temporary).unlink(missing_ok=True)
-
 
 def submission_record(payload: dict[str, Any]) -> dict[str, Any]:
     """Keep the submission ledger useful without duplicating student PII."""

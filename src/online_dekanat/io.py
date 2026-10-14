@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps, ImageSequence
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff"}
 
@@ -13,7 +13,10 @@ def load_pages(file_path: str | Path, dpi: int = 180) -> list[Image.Image]:
     suffix = path.suffix.lower()
     if suffix in IMAGE_EXTENSIONS:
         with Image.open(path) as image:
-            return [image.convert("RGB").copy()]
+            return [
+                ImageOps.exif_transpose(page).convert("RGB").copy()
+                for page in ImageSequence.Iterator(image)
+            ]
     if suffix == ".pdf":
         return _load_pdf_pages(path, dpi=dpi)
     raise ValueError(f"Unsupported file format: {path.suffix}")

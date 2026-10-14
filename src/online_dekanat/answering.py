@@ -59,8 +59,6 @@ def _select_rule(question: str, doc_type: str, regulations: list[dict[str, Any]]
         score = sum(1 for keyword in rule.get("intent_keywords", []) if keyword.lower() in normalized)
         scored.append((score, rule))
     scored.sort(key=lambda item: item[0], reverse=True)
-    if not scored:
+    if not scored or scored[0][0] == 0:
         return None
-    if scored[0][0] == 0:
-        return candidates[0] if len(candidates) == 1 else None
     return scored[0][1]

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG_DIR = PROJECT_ROOT / "config"
+
+# ИСПРАВЛЕНИЕ ДЛЯ DOCKER: Если папка config не найдена по старому пути,
+# мы берём её из текущей рабочей директории контейнера (например, /app/config)
+if not DEFAULT_CONFIG_DIR.exists():
+    DEFAULT_CONFIG_DIR = Path(os.getcwd()) / "config"
 
 
 def load_json(path: Path) -> Any:

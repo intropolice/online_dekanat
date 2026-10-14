@@ -21,8 +21,11 @@ class TesseractOCRClient:
         regions: list[OCRRegion] = []
         pages = load_pages(file_path)
         for page_index, page in enumerate(pages):
-            texts.append(pytesseract.image_to_string(page, lang=self.lang, config=self.config))
-            data = pytesseract.image_to_data(page, lang=self.lang, config=self.config, output_type=pytesseract.Output.DICT)
+            # Sparse-text segmentation works better than a uniform text block
+            # for small scans where layout details are difficult to resolve.
+            config = "--psm 11" if self.config == "--psm 6" and min(page.size) < 900 else self.config
+            texts.append(pytesseract.image_to_string(page, lang=self.lang, config=config))
+            data = pytesseract.image_to_data(page, lang=self.lang, config=config, output_type=pytesseract.Output.DICT)
             for index, raw in enumerate(data.get("text", [])):
                 value = str(raw).strip()
                 try:

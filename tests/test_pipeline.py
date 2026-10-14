@@ -1,24 +1,15 @@
 from pathlib import Path
 
-from online_dekanat.answering import answer_question
-from online_dekanat.config import load_regulations
-from online_dekanat.models import DocumentCard
+import pytest
+
 from online_dekanat.pipeline import DeanOfficePipeline
 
 
-def test_selects_regulation_by_document_type_without_intent_keyword() -> None:
-    regulations = load_regulations()
-    cases = [
-        ("study_certificate", "3.2"),
-        ("academic_leave_application", "4.1"),
-        ("practice_certificate", "5.3"),
-    ]
-
-    for doc_type, provision in cases:
-        card = DocumentCard(doc_type=doc_type, doc_label="", fields={}, raw_text="")
-        answer = answer_question("Проверьте загруженный документ", card, regulations)
-
-        assert f"п. {provision} Положения" in answer.text
+@pytest.fixture(autouse=True)
+def isolate_pipeline_data(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("ONLINE_DEKANAT_DB_PATH", str(tmp_path / "students.db"))
+    monkeypatch.setenv("ONLINE_DEKANAT_STORAGE_ROOT", str(tmp_path / "secure"))
+    monkeypatch.setenv("ONLINE_DEKANAT_RESULTS_PATH", str(tmp_path / "results.json"))
 
 
 def test_pipeline_answers_success_for_complete_study_certificate() -> None:

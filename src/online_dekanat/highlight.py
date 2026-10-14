@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from dataclasses import replace
-from difflib import SequenceMatcher
 import re
 from uuid import uuid4
 from datetime import datetime
@@ -25,7 +24,7 @@ def create_highlights(
         return []
     pages = load_pages(source)
     relevant = _regions_for_card(regions, card)
-    visual = _visual_regions(pages, regions, card, include_empty_signature_slot=True)
+    visual = _visual_regions(pages, regions, card)
     relevant.extend(visual)
     if not relevant:
         return []
@@ -67,6 +66,7 @@ def apply_visual_presence(source: str | Path, regions: list[OCRRegion], card: Do
 
 def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRRegion]:
     selected: dict[int, OCRRegion] = {}
+    queries: list[tuple[list[str], bool]] = []
     for field in card.fields.values():
         if not field.is_found:
             continue
@@ -75,77 +75,68 @@ def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRR
         if field.key in {"signature_and_seal", "student_signature", "signature", "seal"}:
             continue
         value = field.value
-        queries: list[list[str]] = []
         if value.casefold() == "есть":
-            queries = [[token] for token in _tokens(field.title) if token not in {"и", "с", "о"}]
+            queries.extend(
+                ([token], False)
+                for token in _tokens(field.title)
+                if token not in {"и", "с", "о"}
+            )
         else:
             tokens = _tokens(value)
             if tokens:
-                queries = [tokens]
+                queries.append((tokens, field.key == "group"))
                 date_tokens = _date_word_tokens(value)
                 if date_tokens:
-                    queries.append(date_tokens)
+                    queries.append((date_tokens, False))
 
-        label_tokens = [token for token in _tokens(field.title) if token not in {"и", "с", "о"}]
-        for page in sorted({region.page for region in regions}):
-            page_regions = [region for region in regions if region.page == page]
-            stream: list[tuple[str, int, int, int]] = []
-            for region_index, region in enumerate(page_regions):
-                for match in re.finditer(r"[a-zа-яё0-9]+", region.text.casefold()):
-                    stream.append((match.group(), region_index, match.start(), match.end()))
-            hits: list[tuple[tuple[float, int, float], dict[int, list[tuple[int, int]]]]] = []
-            for query in queries:
-                width = len(query)
-                for start in range(0, len(stream) - width + 1):
-                    matched = stream[start : start + width]
-                    if [item[0] for item in matched] != query:
-                        continue
-                    if query and query[-1].isdigit() and start + width < len(stream) and stream[start + width][0] in {"год", "года", "году"}:
-                        matched = [*matched, stream[start + width]]
-                    grouped: dict[int, list[tuple[int, int]]] = {}
-                    for _, region_index, char_start, char_end in matched:
-                        grouped.setdefault(region_index, []).append((char_start, char_end))
-                    matched_bbox = _regions_bbox(page_regions, grouped)
-                    anchors = [
-                        (index, token)
-                        for index, region in enumerate(page_regions)
-                        for token in label_tokens
-                        if token in _tokens(region.text)
-                    ]
-                    if anchors:
-                        anchor_scores = []
-                        for anchor_index, _ in anchors:
-                            anchor = page_regions[anchor_index].bbox
-                            vertical_gap = max(0.0, max(anchor[1] - matched_bbox[3], matched_bbox[1] - anchor[3]))
-                            label_is_right = anchor[0] >= matched_bbox[2]
-                            horizontal_gap = abs(anchor[0] - matched_bbox[2]) if label_is_right else 0
-                            anchor_scores.append((vertical_gap, int(label_is_right), horizontal_gap))
-                        score = min(anchor_scores)
-                    else:
-                        score = (float("inf"), 0, 0)
-                    hits.append((score, grouped))
-            if hits:
-                _, grouped = min(hits, key=lambda hit: hit[0])
+    for page in sorted({region.page for region in regions}):
+        page_regions = [region for region in regions if region.page == page]
+        stream: list[tuple[str, int, int, int]] = []
+        for region_index, region in enumerate(page_regions):
+            for match in re.finditer(r"[a-zа-яё0-9]+", region.text.casefold()):
+                stream.append((match.group(), region_index, match.start(), match.end()))
+        for query, group_code in queries:
+            width = len(query)
+            for start in range(0, len(stream) - width + 1):
+                candidate = [item[0] for item in stream[start : start + width]]
+                if not _highlight_tokens_match(query, candidate, group_code=group_code):
+                    continue
+                matched = stream[start : start + width]
+                if query and query[-1].isdigit() and start + width < len(stream) and stream[start + width][0] in {"год", "года", "году"}:
+                    matched = [*matched, stream[start + width]]
+                grouped: dict[int, list[tuple[int, int]]] = {}
+                for _, region_index, char_start, char_end in matched:
+                    grouped.setdefault(region_index, []).append((char_start, char_end))
                 for region_index, spans in grouped.items():
                     region = page_regions[region_index]
                     char_start = min(span[0] for span in spans)
                     char_end = max(span[1] for span in spans)
                     refined = _refine_bbox(region, char_start, char_end)
                     selected[id(region)] = replace(region, bbox=refined)
+                break
     return list(selected.values())
 
 
-def _regions_bbox(regions: list[OCRRegion], grouped: dict[int, list[tuple[int, int]]]) -> tuple[float, float, float, float]:
-    boxes = [regions[index].bbox for index in grouped]
-    return min(box[0] for box in boxes), min(box[1] for box in boxes), max(box[2] for box in boxes), max(box[3] for box in boxes)
+def _highlight_tokens_match(
+    query: list[str],
+    candidate: list[str],
+    *,
+    group_code: bool = False,
+) -> bool:
+    if candidate == query:
+        return True
+    if not group_code or len(query) < 2 or len(candidate) != len(query):
+        return False
+    if not all(token.isdigit() for token in query[1:]):
+        return False
+    return (
+        candidate[1:] == query[1:]
+        and query[0].isalpha()
+        and candidate[0].isalpha()
+    )
 
 
-def _visual_regions(
-    pages: list[Image.Image],
-    regions: list[OCRRegion],
-    card: DocumentCard,
-    include_empty_signature_slot: bool = False,
-) -> list[OCRRegion]:
+def _visual_regions(pages: list[Image.Image], regions: list[OCRRegion], card: DocumentCard) -> list[OCRRegion]:
     """Find ink/stamp pixels near OCR labels for signature and seal fields."""
     wanted: list[str] = []
     for field in card.fields.values():
@@ -156,35 +147,33 @@ def _visual_regions(
     output: list[OCRRegion] = []
     for page_index, page in enumerate(pages):
         page_regions = [region for region in regions if region.page == page_index]
-        nearby_stamp = _find_colored_stamp_bbox(page) if "signature" in wanted else None
+        colored_components: list[tuple[int, int, int, int, int]] | None = None
         for role in wanted:
             # Prefer the stamp's colored ink over OCR-local pixel components.
             # A round stamp often contains readable OCR text ("ПЕЧАТЬ"), which
             # makes the text itself look like a valid dark component and used
             # to prevent the colored-stamp fallback from running at all.
             if role == "seal":
-                bbox = _find_colored_stamp_bbox(page)
+                if colored_components is None:
+                    colored_components = _colored_ink_components(page)
+                bbox = _find_colored_stamp_bbox(page, colored_components)
                 if bbox is not None:
                     output.append(OCRRegion(role, bbox, page_index))
                     continue
-            label_words = ("подпись",) if role == "signature" else ("печать", "печат")
+            label_words = ("подпись", "подпис") if role == "signature" else ("печать", "печат")
             labels = [
                 region
                 for region in page_regions
-                if any(re.search(rf"\b{word}\w*\b", region.text.casefold()) for word in label_words)
-                and not _is_explanatory_label(_nearby_label_text(region, page_regions))
+                if any(word in region.text.casefold() for word in label_words)
+                and not _is_explanatory_label_region(region, page_regions)
             ]
-            if role == "signature":
-                labels = _merge_signature_label_boxes(labels, page_regions) if labels else _signature_context_labels(page_regions)
             candidates: list[tuple[float, tuple[float, float, float, float]]] = []
             for label in labels:
-                excluded_bbox = nearby_stamp if role == "signature" else None
-                bbox = _find_visual_bbox(page, label.bbox, role, excluded_bbox=excluded_bbox)
-                if bbox is None and role == "signature" and include_empty_signature_slot:
-                    bbox = _find_signature_slot_bbox(page, label.bbox)
+                label_bbox = _signature_label_bbox(label, page_regions) if role == "signature" else label.bbox
+                bbox = _find_visual_bbox(page, label_bbox, role)
                 if bbox is not None:
-                    label_height = max(8.0, label.bbox[3] - label.bbox[1])
-                    label_width = max(8.0, label.bbox[2] - label.bbox[0])
+                    label_height = max(8.0, label_bbox[3] - label_bbox[1])
+                    label_width = max(8.0, label_bbox[2] - label_bbox[0])
                     box_width = bbox[2] - bbox[0]
                     box_height = bbox[3] - bbox[1]
                     # Reject a page-wide underline or a paragraph found below
@@ -196,105 +185,90 @@ def _visual_regions(
             if candidates:
                 _, best = max(candidates, key=lambda item: item[0])
                 output.append(OCRRegion(role, best, page_index))
+            elif role == "signature":
+                if colored_components is None:
+                    colored_components = _colored_ink_components(page)
+                bbox = _find_colored_signature_bbox(page, colored_components)
+                if bbox is not None:
+                    output.append(OCRRegion(role, bbox, page_index))
     return output
-
-
-def _merge_signature_label_boxes(labels: list[OCRRegion], regions: list[OCRRegion]) -> list[OCRRegion]:
-    merged: dict[tuple[float, float, float, float], OCRRegion] = {}
-    for label in labels:
-        x1, y1, x2, y2 = label.bbox
-        text = label.text
-        remaining = [region for region in regions if region is not label and region.page == label.page]
-        while True:
-            label_height = max(8.0, y2 - y1)
-            center_y = (y1 + y2) / 2
-            adjacent = [
-                region
-                for region in remaining
-                if region.bbox[0] >= x2
-                and region.bbox[0] - x2 <= max(8.0, label_height * 1.5)
-                and abs((region.bbox[1] + region.bbox[3]) / 2 - center_y) <= label_height * 0.75
-            ]
-            if not adjacent:
-                break
-            next_region = min(adjacent, key=lambda region: region.bbox[0])
-            x2 = next_region.bbox[2]
-            y1 = min(y1, next_region.bbox[1])
-            y2 = max(y2, next_region.bbox[3])
-            text = f"{text} {next_region.text}"
-            remaining.remove(next_region)
-        box = (x1, y1, x2, y2)
-        merged[box] = OCRRegion(text, box, label.page)
-    return list(merged.values())
-
-
-def _signature_context_labels(regions: list[OCRRegion]) -> list[OCRRegion]:
-    labels: list[OCRRegion] = []
-    role_terms = ("сотрудник", "руководител", "студент")
-    for region in regions:
-        words = _tokens(region.text)
-        if not any(
-            len(word) >= 7 and SequenceMatcher(None, word, term).ratio() >= 0.78
-            for word in words
-            for term in role_terms
-        ):
-            continue
-        x1, y1, x2, y2 = region.bbox
-        height = max(8.0, y2 - y1)
-        center_y = (y1 + y2) / 2
-        preceding = [
-            candidate
-            for candidate in regions
-            if candidate is not region
-            and candidate.bbox[2] <= x1
-            and x1 - candidate.bbox[2] <= max(8.0, height * 1.5)
-            and abs((candidate.bbox[1] + candidate.bbox[3]) / 2 - center_y) <= height * 0.75
-        ]
-        if preceding:
-            previous = max(preceding, key=lambda candidate: candidate.bbox[2])
-            x1 = previous.bbox[0]
-            y1 = min(y1, previous.bbox[1])
-            y2 = max(y2, previous.bbox[3])
-            text = f"{previous.text} {region.text}"
-        else:
-            text = region.text
-        labels.append(OCRRegion(text, (x1, y1, x2, y2), region.page))
-    return labels
 
 
 def _is_explanatory_label(text: str) -> bool:
     normalized = text.casefold()
-    return any(fragment in normalized for fragment in ("все сведения", "учебными макет", "макет", "идентификатор образца"))
+    return any(fragment in normalized for fragment in ("все сведения", "являются учебными", "учебными макет", "идентификатор образца"))
 
 
-def _nearby_label_text(label: OCRRegion, regions: list[OCRRegion]) -> str:
-    center_y = (label.bbox[1] + label.bbox[3]) / 2
-    label_height = max(8.0, label.bbox[3] - label.bbox[1])
-    nearby = [
-        region.text
-        for region in regions
-        if abs((region.bbox[1] + region.bbox[3]) / 2 - center_y) <= label_height * 1.5
-    ]
-    return " ".join(nearby)
+def _is_explanatory_label_region(region: OCRRegion, page_regions: list[OCRRegion]) -> bool:
+    if _is_explanatory_label(region.text):
+        return True
+
+    _, y1, _, y2 = region.bbox
+    center = (y1 + y2) / 2
+    height = max(1.0, y2 - y1)
+    same_line = []
+    for candidate in page_regions:
+        _, candidate_y1, _, candidate_y2 = candidate.bbox
+        candidate_height = max(1.0, candidate_y2 - candidate_y1)
+        candidate_center = (candidate_y1 + candidate_y2) / 2
+        if abs(center - candidate_center) <= max(3.0, min(height, candidate_height) * 0.6):
+            same_line.append(candidate)
+
+    line_text = " ".join(item.text for item in sorted(same_line, key=lambda item: item.bbox[0]))
+    return _is_explanatory_label(line_text)
 
 
-def _find_visual_bbox(
-    page: Image.Image,
-    label_bbox: tuple[float, float, float, float],
-    role: str,
-    excluded_bbox: tuple[int, int, int, int] | None = None,
-) -> tuple[float, float, float, float] | None:
+def _signature_label_bbox(
+    label: OCRRegion,
+    page_regions: list[OCRRegion],
+) -> tuple[float, float, float, float]:
+    x1, y1, x2, y2 = label.bbox
+    height = max(1.0, y2 - y1)
+    center = (y1 + y2) / 2
+    qualifiers = {
+        "сотрудника",
+        "студента",
+        "руководителя",
+        "декана",
+        "директора",
+        "заявителя",
+        "работника",
+        "ответственного",
+        "уполномоченного",
+        "начальника",
+        "преподавателя",
+        "куратора",
+    }
+
+    for region in sorted(page_regions, key=lambda item: item.bbox[0]):
+        rx1, ry1, rx2, ry2 = region.bbox
+        qualifier = re.sub(r"[^a-zа-яё]", "", region.text.casefold())
+        region_height = max(1.0, ry2 - ry1)
+        region_center = (ry1 + ry2) / 2
+        gap = rx1 - x2
+        if (
+            qualifier in qualifiers
+            and gap >= -height * 0.2
+            and gap <= max(3.0, height * 1.5)
+            and abs(center - region_center) <= max(3.0, min(height, region_height) * 0.6)
+        ):
+            x2 = max(x2, rx2)
+            y1 = min(y1, ry1)
+            y2 = max(y2, ry2)
+            height = max(1.0, y2 - y1)
+            center = (y1 + y2) / 2
+
+    return x1, y1, x2, y2
+
+
+def _find_visual_bbox(page: Image.Image, label_bbox: tuple[float, float, float, float], role: str) -> tuple[float, float, float, float] | None:
     width, height = page.size
     x1, y1, x2, y2 = label_bbox
     label_width = max(8.0, x2 - x1)
     label_height = max(8.0, y2 - y1)
     if role == "signature":
-        search = (
-            max(0, int(x1 - label_width * 0.75)),
-            max(0, int(y1 - label_height * 1.5)),
-            min(width, int(x2 + label_width * 2.5)),
-            min(height, int(y2 + label_height * 1.5)),
-        )
+        # A handwritten signature is normally to the right of its printed label.
+        search = (int(x2 + label_width * 0.4), int(max(0, y1 - label_height)), int(min(width, x2 + label_width * 2.5)), int(min(height, y2 + label_height * 2)))
     else:
         # A stamp surrounds the printed "Печать" word and is often circular.
         search = (int(max(0, x1 - label_width * 10)), int(max(0, y1 - label_height * 10)), int(min(width, x2 + label_width * 12)), int(min(height, y2 + label_height * 10)))
@@ -306,18 +280,7 @@ def _find_visual_bbox(
     if role == "seal":
         bbox = _seal_component_bbox(crop, search, label_bbox, threshold=190, min_pixels=minimum)
     else:
-        relative_label = (x1 - search[0], y1 - search[1], x2 - search[0], y2 - search[1])
-        excluded_boxes = [relative_label]
-        if excluded_bbox is not None:
-            excluded_boxes.append(
-                (
-                    excluded_bbox[0] - search[0],
-                    excluded_bbox[1] - search[1],
-                    excluded_bbox[2] - search[0],
-                    excluded_bbox[3] - search[1],
-                )
-            )
-        bbox = _signature_bbox(page.crop(search), threshold=195, min_pixels=minimum, excluded_boxes=excluded_boxes)
+        bbox = _signature_bbox(crop, threshold=170, min_pixels=minimum)
     if bbox is None:
         return None
     cx1, cy1, cx2, cy2 = bbox
@@ -326,89 +289,118 @@ def _find_visual_bbox(
     # edge of the signature search window; that is not a handwritten mark.
     if role == "signature" and (cx1 <= 1 or cy1 <= 1 or cx2 >= crop.width - 1 or cy2 >= crop.height - 1):
         return None
-    padding = 1 if role == "signature" else max(3, int(label_height * 0.35))
+    padding = max(3, int(label_height * 0.35))
     return (max(0, search[0] + cx1 - padding), max(0, search[1] + cy1 - padding), min(width, search[0] + cx2 + padding), min(height, search[1] + cy2 + padding))
 
 
-def _find_signature_slot_bbox(page: Image.Image, label_bbox: tuple[float, float, float, float]) -> tuple[int, int, int, int] | None:
-    """Locate the printed signature line when there are no handwritten strokes."""
-    x1, y1, x2, y2 = label_bbox
-    label_width = max(8.0, x2 - x1)
-    label_height = max(8.0, y2 - y1)
-    search = (
-        int(x2 + label_width * 0.4),
-        int(max(0, y1 - label_height)),
-        int(min(page.width, x2 + label_width * 2.5)),
-        int(min(page.height, y2 + label_height * 2)),
-    )
-    crop = ImageOps.grayscale(page.crop(search))
-    pixels = crop.load()
-    min_line_width = max(12, int(crop.width * 0.25))
-    candidate_rows: list[int] = []
-    for y in range(crop.height):
-        dark_x = [x for x in range(crop.width) if pixels[x, y] < 235]
-        if len(dark_x) >= min_line_width and max(dark_x) - min(dark_x) + 1 >= min_line_width:
-            candidate_rows.append(y)
-    if not candidate_rows:
-        return None
-    row = max(candidate_rows, key=lambda candidate: sum(pixels[x, candidate] < 235 for x in range(crop.width)))
-    dark_x = [x for x in range(crop.width) if pixels[x, row] < 235]
-    return (
-        search[0] + min(dark_x),
-        max(0, search[1] + row - 3),
-        search[0] + max(dark_x) + 1,
-        min(page.height, search[1] + row + 4),
-    )
-
-
-def _find_colored_stamp_bbox(page: Image.Image) -> tuple[int, int, int, int] | None:
+def _find_colored_stamp_bbox(
+    page: Image.Image,
+    components: list[tuple[int, int, int, int, int]] | None = None,
+) -> tuple[int, int, int, int] | None:
     """Find the largest blue/colored stamp when OCR missed its inner text."""
-    rgb = page.convert("RGB")
+    width, height = page.size
+    components = components if components is not None else _colored_ink_components(page)
+    stamps = [
+        component
+        for component in components
+        if component[4] >= 25
+        and component[2] - component[0] >= 20
+        and component[3] - component[1] >= 20
+        and 0.55 <= (component[2] - component[0]) / max(1, component[3] - component[1]) <= 1.8
+    ]
+    if not stamps:
+        return None
+    largest = max(stamps, key=lambda item: (item[2] - item[0]) * (item[3] - item[1]))
+    padding = max(3, min(largest[2] - largest[0], largest[3] - largest[1]) // 12)
+    return max(0, largest[0] - padding), max(0, largest[1] - padding), min(width, largest[2] + padding), min(height, largest[3] + padding)
+
+
+def _find_colored_signature_bbox(
+    page: Image.Image,
+    components: list[tuple[int, int, int, int, int]] | None = None,
+) -> tuple[int, int, int, int] | None:
+    """Find a blue handwritten signature when OCR misses its printed label."""
+    width, height = page.size
+    components = components if components is not None else _colored_ink_components(page)
+    stamp_boxes = [
+        component[:4]
+        for component in components
+        if component[4] >= 25
+        and component[2] - component[0] >= 20
+        and component[3] - component[1] >= 20
+        and 0.55 <= (component[2] - component[0]) / max(1, component[3] - component[1]) <= 1.8
+    ]
+    signatures = []
+    for component in components:
+        x1, y1, x2, y2, pixels_count = component
+        box_width, box_height = x2 - x1, y2 - y1
+        ratio = box_width / max(1, box_height)
+        if (
+            pixels_count < 25
+            or box_width < 20
+            or box_height < 4
+            or box_height > height * 0.15
+            or box_width > width * 0.4
+            or not 1.8 <= ratio <= 10
+            or x1 <= 1
+            or y1 <= 1
+            or x2 >= width - 1
+            or y2 >= height - 1
+        ):
+            continue
+        if any(
+            x1 < stamp[2] and x2 > stamp[0] and y1 < stamp[3] and y2 > stamp[1]
+            for stamp in stamp_boxes
+        ):
+            continue
+        signatures.append(component)
+    if not signatures:
+        return None
+    largest = max(signatures, key=lambda item: item[4])
+    padding = max(3, min(largest[3] - largest[1], 12) // 3)
+    return max(0, largest[0] - padding), max(0, largest[1] - padding), min(width, largest[2] + padding), min(height, largest[3] + padding)
+
+
+def _colored_ink_components(image: Image.Image) -> list[tuple[int, int, int, int, int]]:
+    rgb = image.convert("RGB")
     width, height = rgb.size
     pixels = rgb.load()
     visited = bytearray(width * height)
     components: list[tuple[int, int, int, int, int]] = []
 
-    def is_stamp_pixel(x: int, y: int) -> bool:
+    def is_colored_ink(x: int, y: int) -> bool:
         red, green, blue = pixels[x, y]
-        # Dark application chrome is commonly blue tinted too. Require a
-        # minimum brightness so it cannot be mistaken for the document stamp
-        # when a screenshot (rather than a cropped page) is uploaded.
+        # Exclude dark application chrome when a screenshot is uploaded.
         return max(red, green, blue) >= 70 and max(red, green, blue) - min(red, green, blue) >= 28 and blue >= red * 1.05 and blue >= green * 0.92
 
     for y in range(height):
         for x in range(width):
             index = y * width + x
-            if visited[index] or not is_stamp_pixel(x, y):
-                visited[index] = 1
+            if visited[index]:
                 continue
             visited[index] = 1
-            stack = [(x, y)]
-            points: list[tuple[int, int]] = []
-            while stack:
-                px, py = stack.pop()
-                points.append((px, py))
-                for ny in range(max(0, py - 1), min(height, py + 2)):
-                    for nx in range(max(0, px - 1), min(width, px + 2)):
-                        ni = ny * width + nx
-                        if not visited[ni]:
-                            visited[ni] = 1
-                            if is_stamp_pixel(nx, ny):
-                                stack.append((nx, ny))
-            if len(points) < 25:
+            if not is_colored_ink(x, y):
                 continue
-            xs = [point[0] for point in points]
-            ys = [point[1] for point in points]
-            box = (min(xs), min(ys), max(xs) + 1, max(ys) + 1, len(points))
-            box_width, box_height = box[2] - box[0], box[3] - box[1]
-            ratio = box_width / max(1, box_height)
-            if box_width >= 20 and box_height >= 20 and 0.55 <= ratio <= 1.8:
-                components.append(box)
-    if not components:
-        return None
-    largest = max(components, key=lambda item: (item[2] - item[0]) * (item[3] - item[1]))
-    padding = max(3, min(largest[2] - largest[0], largest[3] - largest[1]) // 12)
-    return max(0, largest[0] - padding), max(0, largest[1] - padding), min(width, largest[2] + padding), min(height, largest[3] + padding)
+            stack = [(x, y)]
+            min_x = max_x = x
+            min_y = max_y = y
+            count = 0
+            while stack:
+                current_x, current_y = stack.pop()
+                count += 1
+                min_x = min(min_x, current_x)
+                max_x = max(max_x, current_x)
+                min_y = min(min_y, current_y)
+                max_y = max(max_y, current_y)
+                for neighbor_y in range(max(0, current_y - 1), min(height, current_y + 2)):
+                    for neighbor_x in range(max(0, current_x - 1), min(width, current_x + 2)):
+                        neighbor_index = neighbor_y * width + neighbor_x
+                        if not visited[neighbor_index]:
+                            visited[neighbor_index] = 1
+                            if is_colored_ink(neighbor_x, neighbor_y):
+                                stack.append((neighbor_x, neighbor_y))
+            components.append((min_x, min_y, max_x + 1, max_y + 1, count))
+    return components
 
 
 def _ink_bbox(image: Image.Image, threshold: int, min_pixels: int, exclude_rule: bool = False) -> tuple[int, int, int, int] | None:
@@ -436,32 +428,16 @@ def _ink_bbox(image: Image.Image, threshold: int, min_pixels: int, exclude_rule:
     return min(xs), min(ys), max(xs) + 1, max(ys) + 1
 
 
-def _signature_bbox(
-    image: Image.Image,
-    threshold: int,
-    min_pixels: int,
-    excluded_boxes: list[tuple[float, float, float, float]] | None = None,
-) -> tuple[int, int, int, int] | None:
+def _signature_bbox(image: Image.Image, threshold: int, min_pixels: int) -> tuple[int, int, int, int] | None:
     """Return handwriting strokes while ignoring the thin printed underline."""
-    grayscale = ImageOps.grayscale(image)
-    pixels = grayscale.load()
+    pixels = ImageOps.grayscale(image).load()
     width, height = image.size
     visited = bytearray(width * height)
     components: list[tuple[int, int, int, int, int]] = []
-
-    def is_ink(x: int, y: int) -> bool:
-        if pixels[x, y] >= threshold:
-            return False
-        if not excluded_boxes:
-            return True
-        if not any(bx1 <= x < bx2 and by1 <= y < by2 for bx1, by1, bx2, by2 in excluded_boxes):
-            return True
-        return False
-
     for y in range(height):
         for x in range(width):
             index = y * width + x
-            if visited[index] or not is_ink(x, y):
+            if visited[index] or pixels[x, y] >= threshold:
                 visited[index] = 1
                 continue
             visited[index] = 1
@@ -475,7 +451,7 @@ def _signature_bbox(
                         ni = ny * width + nx
                         if not visited[ni]:
                             visited[ni] = 1
-                            if is_ink(nx, ny):
+                            if pixels[nx, ny] < threshold:
                                 stack.append((nx, ny))
             if len(points) < min_pixels:
                 continue

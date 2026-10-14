@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,9 @@ class PaddleOCRClient:
         self._engine: Any | None = None
 
     def recognize(self, file_path: str | Path) -> OCRResult:
+        if sys.version_info >= (3, 14):
+            version = ".".join(str(part) for part in sys.version_info[:2])
+            raise RuntimeError(f"PaddleOCR is not included in the project extras on Python {version}.")
         try:
             from paddleocr import PaddleOCR
         except ImportError as exc:

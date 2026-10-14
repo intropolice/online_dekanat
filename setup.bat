@@ -3,9 +3,11 @@ setlocal
 cd /d "%~dp0"
 
 echo === Online Dekanat: dependency setup ===
-echo This installs the project, development and dataset tools, and all Python OCR backends.
-echo PaddleOCR and EasyOCR can require several gigabytes of downloads.
+echo This installs the project with the local Tesseract OCR backend.
 echo.
+
+if not defined PIP_INDEX_URL set "PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple"
+if not defined TESSDATA_SOURCE_URL set "TESSDATA_SOURCE_URL=https://gitee.com/dalaomai/tessdata_fast/raw/main"
 
 if exist ".venv\Scripts\python.exe" (
     set "VENV_PY=%CD%\.venv\Scripts\python.exe"
@@ -27,13 +29,16 @@ if errorlevel 1 goto python_setup_failed
 set "VENV_PY=%CD%\.venv\Scripts\python.exe"
 
 :install_python_packages
+call "%VENV_PY%" -c "import sys; sys.exit(sys.version_info < (3, 11))"
+if errorlevel 1 goto python_too_old
+
 echo [1/3] Upgrading pip...
-call "%VENV_PY%" -m pip install --upgrade pip
+call "%VENV_PY%" -m pip install --upgrade pip --index-url "%PIP_INDEX_URL%"
 if errorlevel 1 goto pip_upgrade_failed
 
 echo.
-echo [2/3] Installing all project extras...
-call "%VENV_PY%" -m pip install -e ".[dev,dataset,ocr]"
+echo [2/3] Installing the project and Tesseract adapter...
+call "%VENV_PY%" -m pip install --index-url "%PIP_INDEX_URL%" -e ".[tesseract]"
 if errorlevel 1 goto packages_failed
 
 echo.
@@ -66,7 +71,7 @@ if errorlevel 1 goto curl_not_found
 for %%L in (eng rus) do (
     if not exist "%TESSDATA_DIR%\%%L.traineddata" (
         echo Downloading %%L language data...
-        curl.exe --fail --location --silent --show-error --output "%TESSDATA_DIR%\%%L.traineddata" "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/%%L.traineddata"
+        curl.exe --fail --location --silent --show-error --output "%TESSDATA_DIR%\%%L.traineddata" "%TESSDATA_SOURCE_URL%/%%L.traineddata"
         if errorlevel 1 goto language_download_failed
     )
 )
@@ -86,12 +91,16 @@ echo Setup completed successfully.
 echo Restart terminals and VS Code so the TESSDATA_PREFIX setting is picked up.
 echo Activate the environment with: .venv\Scripts\activate
 echo Start the app with: .venv\Scripts\online-dekanat.exe serve --host 127.0.0.1 --port 8000
-echo OCR model weights are downloaded by the OCR backends when they are first used.
+echo Tesseract runs locally; optional PaddleOCR and EasyOCR models download on first use.
 pause
 exit /b 0
 
+:python_too_old
+echo ERROR: Python 3.11 or later is required. Install Python and run this file again.
+goto failed
+
 :python_not_found
-echo ERROR: Python 3.10 or later was not found. Install Python and run this file again.
+echo ERROR: Python 3.11 or later was not found. Install Python and run this file again.
 goto failed
 
 :python_setup_failed

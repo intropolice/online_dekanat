@@ -26,6 +26,8 @@ def main() -> None:
     serve.add_argument("--port", default=8000, type=int)
     serve.add_argument("--backend", default="auto", choices=["auto", "fastapi", "simple"])
 
+    subparsers.add_parser("create-admin", help="Create the first employee administrator account.")
+
     sample = subparsers.add_parser("mws-sample", help="Export a local sample from MTSAIR/MWS-Vision-Bench.")
     sample.add_argument("--out", default="data/mws_sample.jsonl")
     sample.add_argument("--config", default="default")
@@ -56,6 +58,23 @@ def main() -> None:
     elif args.command == "mws-sample":
         output = export_mws_sample(args.out, config=args.config, task_type=args.task_type, limit=args.limit)
         print(f"Wrote {output}")
+    elif args.command == "create-admin":
+        from online_dekanat.collaboration import CollaborationStore, generate_temporary_password
+        from online_dekanat.mail_delivery import EmailDeliveryError, send_temporary_password
+
+        email = input("Почта администратора: ").strip()
+        temporary_password = generate_temporary_password()
+        try:
+            user = CollaborationStore().create_admin(
+                email,
+                temporary_password,
+                deliver_temporary_password=lambda password: send_temporary_password(
+                    email, password
+                ),
+            )
+        except (ValueError, EmailDeliveryError) as exc:
+            parser.error(str(exc))
+        print(f"Создан администратор: {user['email']}. Временный пароль отправлен на почту.")
 
 
 def _select_server_backend(requested: str) -> str:
