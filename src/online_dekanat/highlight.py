@@ -6,7 +6,7 @@ import re
 from uuid import uuid4
 from datetime import datetime
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 from PIL import ImageOps
 
 from online_dekanat.ocr.base import OCRRegion
@@ -42,6 +42,28 @@ def create_highlights(
             continue
         path = root / f"{uuid4().hex}-page-{page_index + 1}.png"
         canvas.save(path, format="PNG", optimize=True)
+        output.append(str(path))
+    for region in visual:
+        if region.text != "signature" or region.page < 0 or region.page >= len(pages):
+            continue
+        page = pages[region.page].convert("RGB")
+        x1, y1, x2, y2 = region.bbox
+        padding_x = max(16, int((x2 - x1) * 0.2))
+        padding_y = max(12, int((y2 - y1) * 0.35))
+        crop = page.crop(
+            (
+                max(0, int(x1 - padding_x)),
+                max(0, int(y1 - padding_y)),
+                min(page.width, int(x2 + padding_x)),
+                min(page.height, int(y2 + padding_y)),
+            )
+        )
+        crop = crop.resize(
+            (crop.width * 2, crop.height * 2),
+            Image.Resampling.LANCZOS,
+        )
+        path = root / f"{uuid4().hex}-signature-detail.png"
+        crop.save(path, format="PNG", optimize=True)
         output.append(str(path))
     return output
 

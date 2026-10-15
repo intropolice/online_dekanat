@@ -91,3 +91,79 @@ def test_practice_certificate_extracts_dates_supervisor_and_certificate_number()
     assert card.fields["issue_number"].value == "ПР-2024"
     assert card.fields["issue_date"].value == "17.06.2026"
     assert "practice_period" not in card.fields
+
+
+def test_practice_end_is_not_guessed_from_issue_date_when_label_has_no_date() -> None:
+    text = "\n".join(
+        [
+            "Дата начала практики: 01.06.2026",
+            "Дата окончания практики:",
+            "Дата выдачи: 23.07.2026",
+        ]
+    )
+
+    card = extract_card(text, load_document_types(), "practice_certificate")
+
+    assert card.fields["practice_end"].value == NOT_FOUND
+    assert card.fields["issue_date"].value == "23.07.2026"
+
+
+def test_empty_practice_fields_do_not_capture_values_from_the_next_line() -> None:
+    text = "\n".join(
+        [
+            "Организация:",
+            "Дата начала практики: 01.06.2026",
+            "ФИО руководителя практики: ",
+            "Оценка: удовлетворительно",
+        ]
+    )
+
+    card = extract_card(text, load_document_types(), "practice_certificate")
+
+    assert card.fields["organization"].value == NOT_FOUND
+    assert card.fields["supervisor"].value == NOT_FOUND
+    assert card.fields["grade"].value == "удовлетворительно"
+
+
+def test_study_period_end_is_extracted_when_ocr_splits_label_and_date() -> None:
+    text = "\n".join(
+        [
+            "Окончание периода обучения:",
+            "31.08.2026",
+            "Дата выдачи: 01.09.2026",
+        ]
+    )
+
+    card = extract_card(text, load_document_types(), "study_certificate")
+
+    assert card.fields["study_period_end"].value == "31.08.2026"
+    assert card.fields["issue_date"].value == "01.09.2026"
+
+
+def test_study_period_end_tolerates_ocr_typo_in_label() -> None:
+    text = "Окончание периода обучени: 31.08.2026"
+
+    card = extract_card(text, load_document_types(), "study_certificate")
+
+    assert card.fields["study_period_end"].value == "31.08.2026"
+
+
+def test_study_period_end_extracts_date_with_spaces_from_ocr() -> None:
+    text = "Отончание периода обучения 31 08 2026"
+
+    card = extract_card(text, load_document_types(), "study_certificate")
+
+    assert card.fields["study_period_end"].value == "31.08.2026"
+
+
+def test_study_period_end_does_not_use_the_next_labeled_date() -> None:
+    text = "\n".join(
+        [
+            "Окончание периода обучения:",
+            "Дата выдачи: 01.09.2026",
+        ]
+    )
+
+    card = extract_card(text, load_document_types(), "study_certificate")
+
+    assert card.fields["study_period_end"].value == NOT_FOUND

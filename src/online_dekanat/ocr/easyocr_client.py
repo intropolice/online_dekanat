@@ -19,7 +19,7 @@ class EasyOCRClient:
         try:
             import easyocr
         except ImportError as exc:
-            raise RuntimeError("EasyOCR is not installed. Install with: python -m pip install -e .[easyocr]") from exc
+            raise RuntimeError("EasyOCR не установлен. Установите дополнительный набор зависимостей easyocr.") from exc
         if self._reader is None:
             self._reader = easyocr.Reader(self.languages, gpu=self.gpu, verbose=False)
         texts: list[str] = []

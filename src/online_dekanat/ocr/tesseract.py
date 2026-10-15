@@ -15,7 +15,7 @@ class TesseractOCRClient:
         try:
             import pytesseract
         except ImportError as exc:
-            raise RuntimeError("Tesseract adapter requires pytesseract. Install with: python -m pip install -e .[tesseract]") from exc
+            raise RuntimeError("Адаптер Tesseract не установлен. Установите дополнительный набор зависимостей tesseract.") from exc
 
         texts: list[str] = []
         regions: list[OCRRegion] = []

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 from pathlib import Path
 import os
 import re
 import tempfile
 from typing import Any
 
-from PIL import Image, ImageFilter, ImageStat
+from PIL import Image, ImageEnhance, ImageFilter, ImageStat
 
 from online_dekanat.io import IMAGE_EXTENSIONS, load_pages
+from online_dekanat.ocr.base import OCRRegion
 
 logger = logging.getLogger(__name__)
 
@@ -139,19 +141,28 @@ def _page_rotation(page: Image.Image, pytesseract: Any) -> int:
 def prepare_for_ocr(path: str | Path, quality: dict[str, Any]) -> Path:
     """Create an enhanced temporary image for hard photo inputs."""
     source = Path(path)
-    if source.suffix.lower() not in IMAGE_EXTENSIONS or quality.get("status") not in {"warning", "bad"}:
+    if source.suffix.lower() not in IMAGE_EXTENSIONS or not quality.get("issues"):
         return source
-    from PIL import ImageEnhance, ImageOps
+    from PIL import ImageOps
 
     pages = load_pages(source)
     enhanced_pages: list[Image.Image] = []
+    preserve_tones = "overexposed" in quality.get("issues", [])
     for page in pages:
         image = ImageOps.grayscale(page).convert("RGB")
-        image = ImageOps.autocontrast(image, cutoff=1)
-        image = ImageEnhance.Contrast(image).enhance(1.25)
-        if min(image.size) >= 900:
-            image = image.filter(ImageFilter.MedianFilter(size=3))
-        image = image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+        longest_side = max(image.size)
+        if longest_side < 1400:
+            scale = min(2.0, 1400 / longest_side)
+            image = image.resize(
+                (round(image.width * scale), round(image.height * scale)),
+                Image.Resampling.LANCZOS,
+            )
+        if not preserve_tones:
+            image = ImageOps.autocontrast(image, cutoff=1)
+            image = ImageEnhance.Contrast(image).enhance(1.4)
+            if min(image.size) >= 900:
+                image = image.filter(ImageFilter.MedianFilter(size=3))
+            image = image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
         enhanced_pages.append(image)
     handle, name = tempfile.mkstemp(prefix="dekanat-enhanced-", suffix=".tiff")
     os.close(handle)
@@ -163,3 +174,35 @@ def prepare_for_ocr(path: str | Path, quality: dict[str, Any]) -> Path:
         compression="tiff_deflate",
     )
     return Path(name)
+
+
+def rescale_ocr_regions(
+    regions: list[OCRRegion],
+    ocr_path: str | Path,
+    display_path: str | Path,
+) -> list[OCRRegion]:
+    """Map OCR coordinates from the processed pages back to displayed pages."""
+    if Path(ocr_path) == Path(display_path):
+        return regions
+
+    ocr_pages = load_pages(ocr_path)
+    display_pages = load_pages(display_path)
+    if len(ocr_pages) != len(display_pages):
+        raise ValueError("Количество страниц OCR не совпадает с исходным документом")
+
+    scaled: list[OCRRegion] = []
+    for region in regions:
+        if region.page < 0 or region.page >= len(ocr_pages):
+            raise ValueError(f"Некорректный номер страницы OCR: {region.page}")
+        ocr_width, ocr_height = ocr_pages[region.page].size
+        display_width, display_height = display_pages[region.page].size
+        scale_x = display_width / ocr_width
+        scale_y = display_height / ocr_height
+        x1, y1, x2, y2 = region.bbox
+        scaled.append(
+            replace(
+                region,
+                bbox=(x1 * scale_x, y1 * scale_y, x2 * scale_x, y2 * scale_y),
+            )
+        )
+    return scaled

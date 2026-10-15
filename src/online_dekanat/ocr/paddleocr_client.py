@@ -19,11 +19,11 @@ class PaddleOCRClient:
     def recognize(self, file_path: str | Path) -> OCRResult:
         if sys.version_info >= (3, 14):
             version = ".".join(str(part) for part in sys.version_info[:2])
-            raise RuntimeError(f"PaddleOCR is not included in the project extras on Python {version}.")
+            raise RuntimeError(f"PaddleOCR не поддерживается в дополнительных зависимостях проекта для Python {version}.")
         try:
             from paddleocr import PaddleOCR
         except ImportError as exc:
-            raise RuntimeError("PaddleOCR is not installed. Install with: python -m pip install -e .[paddleocr]") from exc
+            raise RuntimeError("PaddleOCR не установлен. Установите дополнительный набор зависимостей paddleocr.") from exc
         if self._engine is None:
             self._engine = self._create_engine(PaddleOCR)
         texts: list[str] = []
@@ -46,7 +46,7 @@ class PaddleOCRClient:
                 return paddle_ocr(**kwargs)
             except Exception as exc:
                 last_error = exc
-        raise RuntimeError(f"PaddleOCR could not be initialized: {last_error}") from last_error
+        raise RuntimeError("Не удалось инициализировать PaddleOCR.") from last_error
 
     def _recognize_page(self, page: Any, page_index: int = 0) -> tuple[str, list[OCRRegion]]:
         import numpy as np

@@ -109,6 +109,13 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
         TestClient(api.app) as admin_client,
         TestClient(api.app) as other,
     ):
+        from starlette.websockets import WebSocketDisconnect
+
+        assert 'body class="staff-page"' in staff.get("/staff").text
+        assert 'href="/staff"' in visitor.get("/ui").text
+        with pytest.raises(WebSocketDisconnect):
+            with other.websocket_connect("/chat/staff/ws"):
+                pass
         assert visitor.get("/students").status_code == 401
         assert visitor.post(
             "/auth/register/request", json={"email": "employee@mail.ru"}
@@ -140,6 +147,21 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
         ).status_code == 200
         assert staff.get("/chat/conversations").status_code == 200
         assert staff.get("/auth/users").status_code == 403
+        staff_chat = staff.post("/chat/conversations")
+        assert staff_chat.status_code == 200
+        staff_conversation = staff_chat.json()["conversation"]["id"]
+        staff_visitor_message = staff.post(
+            f"/chat/conversations/{staff_conversation}/messages",
+            data={"body": "Сообщение от пользователя с аккаунтом сотрудника"},
+        )
+        assert staff_visitor_message.status_code == 200
+        assert staff_visitor_message.json()["sender_kind"] == "visitor"
+        assert staff.get(
+            f"/chat/conversations/{staff_conversation}/messages"
+        ).json()[0]["body"] == "Сообщение от пользователя с аккаунтом сотрудника"
+        assert other.get(
+            f"/chat/conversations/{staff_conversation}/messages"
+        ).status_code == 404
 
         conversation = visitor.post("/chat/conversations").json()["conversation"]["id"]
         uploaded = visitor.post(
@@ -155,21 +177,32 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
 
         assert staff.get("/chat/conversations").json()[0]["id"] == conversation
         assert staff.get(f"/chat/conversations/{conversation}/messages").json()[0]["body"] == "Проверьте файл"
+        other_conversation = other.post("/chat/conversations").json()["conversation"]["id"]
         with visitor.websocket_connect(f"/chat/ws/{conversation}") as visitor_socket:
             with staff.websocket_connect(f"/chat/ws/{conversation}") as staff_socket:
-                visitor_reply = visitor.post(
-                    f"/chat/conversations/{conversation}/messages",
-                    data={"body": "Ответ посетителя"},
-                )
-                assert visitor_reply.status_code == 200
-                assert staff_socket.receive_json()["message"]["body"] == "Ответ посетителя"
-                assert visitor_socket.receive_json()["message"]["body"] == "Ответ посетителя"
-                staff_reply = staff.post(
-                    f"/chat/conversations/{conversation}/messages",
-                    data={"body": "Ответ сотрудника"},
-                )
-                assert staff_reply.status_code == 200
-                assert visitor_socket.receive_json()["message"]["body"] == "Ответ сотрудника"
+                with staff.websocket_connect("/chat/staff/ws") as staff_events:
+                    visitor_reply = visitor.post(
+                        f"/chat/conversations/{conversation}/messages",
+                        data={"body": "Ответ посетителя"},
+                    )
+                    assert visitor_reply.status_code == 200
+                    assert staff_socket.receive_json()["message"]["body"] == "Ответ посетителя"
+                    assert staff_events.receive_json()["message"]["body"] == "Ответ посетителя"
+                    assert visitor_socket.receive_json()["message"]["body"] == "Ответ посетителя"
+                    second_reply = other.post(
+                        f"/chat/conversations/{other_conversation}/messages",
+                        data={"body": "Новое обращение"},
+                    )
+                    assert second_reply.status_code == 200
+                    event = staff_events.receive_json()["message"]
+                    assert event["body"] == "Новое обращение"
+                    assert event["conversation_id"] == other_conversation
+                    staff_reply = staff.post(
+                        f"/chat/conversations/{conversation}/messages",
+                        data={"body": "Ответ сотрудника"},
+                    )
+                    assert staff_reply.status_code == 200
+                    assert visitor_socket.receive_json()["message"]["body"] == "Ответ сотрудника"
 
         assert visitor.get(f"/chat/conversations/{conversation}/messages").json()[-1]["body"] == "Ответ сотрудника"
         assert admin_client.post(

@@ -44,7 +44,9 @@ def test_paddleocr_import_error_is_actionable_on_python_314(monkeypatch: pytest.
     monkeypatch.setattr(builtins, "__import__", import_without_paddleocr)
     monkeypatch.setattr(sys, "version_info", (3, 14))
 
-    with pytest.raises(RuntimeError, match="not included in the project extras on Python 3.14"):
+    with pytest.raises(
+        RuntimeError, match="не поддерживается в дополнительных зависимостях проекта"
+    ):
         PaddleOCRClient().recognize("unused")
 
 

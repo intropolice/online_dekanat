@@ -19,14 +19,14 @@ def load_pages(file_path: str | Path, dpi: int = 180) -> list[Image.Image]:
             ]
     if suffix == ".pdf":
         return _load_pdf_pages(path, dpi=dpi)
-    raise ValueError(f"Unsupported file format: {path.suffix}")
+    raise ValueError(f"Формат файла не поддерживается: {path.suffix or 'без расширения'}.")
 
 
 def _load_pdf_pages(path: Path, dpi: int) -> list[Image.Image]:
     try:
         import fitz
     except ImportError as exc:
-        raise RuntimeError("PDF input requires pymupdf. Install the base project dependencies.") from exc
+        raise RuntimeError("Для обработки PDF установите основные зависимости проекта.") from exc
 
     pages: list[Image.Image] = []
     document = fitz.open(path)

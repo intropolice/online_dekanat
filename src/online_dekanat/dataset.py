@@ -9,7 +9,7 @@ def load_mws_vision_bench(config: str = "default", split: str = "train"):
     try:
         from datasets import load_dataset
     except ImportError as exc:
-        raise RuntimeError("Install dataset dependencies with: python -m pip install -e .[dataset]") from exc
+        raise RuntimeError("Для работы с набором данных установите дополнительный набор зависимостей dataset.") from exc
     return load_dataset("MTSAIR/MWS-Vision-Bench", config, split=split)
 
 

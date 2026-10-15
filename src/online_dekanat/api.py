@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import os
+import logging
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware import Middleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
@@ -17,14 +19,26 @@ from online_dekanat.mail_delivery import (
     send_temporary_password,
 )
 from online_dekanat.pipeline import DeanOfficePipeline
-from online_dekanat.ui import UI_HTML
+from online_dekanat.ui import STAFF_UI_HTML, UI_HTML
 from online_dekanat.secure_storage import EncryptedStorage
 from online_dekanat.database import StudentDatabase
+from online_dekanat.uploads import MAX_UPLOAD_SIZE, validate_upload
 
-MAX_CHAT_FILE_SIZE = 20 * 1024 * 1024
+logger = logging.getLogger(__name__)
+MAX_CHAT_FILE_SIZE = MAX_UPLOAD_SIZE
 ALLOWED_CHAT_EXTENSIONS = {
     ".bmp", ".doc", ".docx", ".jpeg", ".jpg", ".pdf", ".png",
     ".ppt", ".pptx", ".tif", ".tiff", ".txt", ".webp", ".xls", ".xlsx",
+}
+CHAT_FILE_MEDIA_TYPES = {
+    ".bmp": "image/bmp",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".pdf": "application/pdf",
+    ".png": "image/png",
+    ".tif": "image/tiff",
+    ".tiff": "image/tiff",
+    ".webp": "image/webp",
 }
 
 app = FastAPI(
@@ -87,6 +101,22 @@ class ChatSockets:
 
 
 _chat_sockets = ChatSockets()
+_STAFF_CHAT_CHANNEL = "__staff__"
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    logger.info(
+        "Отклонён некорректный запрос к %s (%s ошибок проверки)",
+        request.url.path,
+        len(exc.errors()),
+    )
+    return JSONResponse(
+        {"detail": "Некорректный запрос. Проверьте обязательные поля и формат данных."},
+        status_code=422,
+    )
 
 
 @app.middleware("http")
@@ -95,13 +125,18 @@ async def limit_chat_upload_body(
 ) -> Response:
     if (
         request.method == "POST"
-        and request.url.path.startswith("/chat/conversations/")
-        and request.url.path.endswith("/messages")
+        and (
+            request.url.path == "/process"
+            or (
+                request.url.path.startswith("/chat/conversations/")
+                and request.url.path.endswith("/messages")
+            )
+        )
     ):
         content_length = request.headers.get("content-length")
-        if content_length and content_length.isdigit() and int(content_length) > MAX_CHAT_FILE_SIZE + 1024 * 1024:
+        if content_length and content_length.isdigit() and int(content_length) > MAX_UPLOAD_SIZE + 1024 * 1024:
             return JSONResponse(
-                {"detail": "Размер файла не должен превышать 20 МБ"},
+                {"detail": "Размер файла не должен превышать 16 МБ."},
                 status_code=413,
             )
     return await call_next(request)
@@ -212,17 +247,34 @@ async def process_document(
     ocr: str = Form(default="auto"),
 ):
     suffix = Path(file.filename or "document").suffix or ".bin"
+    try:
+        validate_upload(file.filename or "document")
+    except ValueError as exc:
+        await file.close()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     storage = EncryptedStorage()
     tmp_path = None
     try:
-        tmp_path = storage.save(await file.read(), suffix=suffix)
+        payload = await file.read(MAX_UPLOAD_SIZE + 1)
+        if len(payload) > MAX_UPLOAD_SIZE:
+            raise HTTPException(status_code=413, detail="Размер файла не должен превышать 16 МБ.")
+        if not payload:
+            raise HTTPException(status_code=400, detail="Файл пустой.")
+        tmp_path = storage.save(payload, suffix=suffix)
         result = DeanOfficePipeline(ocr_name=ocr).process(tmp_path, question=question, doc_type=doc_type or None)
         return result.to_dict()
+    except HTTPException:
+        raise
     except Exception as exc:
-        return JSONResponse({"error": str(exc)}, status_code=400)
+        logger.exception("Не удалось обработать загруженный документ")
+        return JSONResponse(
+            {"error": "Не удалось обработать документ. Проверьте формат и качество файла и попробуйте ещё раз."},
+            status_code=400,
+        )
     finally:
         if tmp_path is not None:
             tmp_path.unlink(missing_ok=True)
+        await file.close()
 
 
 @app.get("/highlights/{filename}")
@@ -230,7 +282,7 @@ def highlight(filename: str) -> FileResponse:
     root = Path("data/highlights").resolve()
     path = (root / filename).resolve()
     if path.parent != root or not path.is_file():
-        return JSONResponse({"error": "highlight not found"}, status_code=404)
+        return JSONResponse({"error": "Фрагмент документа не найден."}, status_code=404)
     return FileResponse(path, media_type="image/png")
 
 
@@ -262,8 +314,6 @@ def current_conversation(request: Request) -> dict:
 @app.post("/chat/conversations")
 def create_conversation(request: Request) -> dict:
     _check_same_origin(request)
-    if _session_user(request) is not None:
-        raise HTTPException(status_code=409, detail="Сотрудники используют список обращений")
     visitor_token = request.session.get("visitor_token")
     conversation_id = request.session.get("visitor_conversation_id")
     if visitor_token and conversation_id and _collaboration.visitor_owns(conversation_id, visitor_token):
@@ -294,10 +344,21 @@ async def create_message(
     conversation_id: str,
     request: Request,
     body: str = Form(default=""),
+    sender_kind: str = Form(default="visitor"),
     file: UploadFile | None = File(default=None),
 ) -> dict:
     _check_same_origin(request)
-    user = _authorize_conversation(conversation_id, request)
+    if sender_kind == "staff":
+        user = _require_staff(request)
+        if not _collaboration.conversation_exists(conversation_id):
+            raise HTTPException(status_code=404, detail="Обращение не найдено")
+    elif sender_kind == "visitor":
+        visitor_token = request.session.get("visitor_token")
+        if not visitor_token or not _collaboration.visitor_owns(conversation_id, visitor_token):
+            raise HTTPException(status_code=404, detail="Обращение не найдено")
+        user = None
+    else:
+        raise HTTPException(status_code=400, detail="Некорректный тип отправителя")
     if len(body) > 20_000:
         raise HTTPException(status_code=400, detail="Сообщение не должно превышать 20 000 символов")
     stored_file = None
@@ -313,7 +374,7 @@ async def create_message(
                 raise HTTPException(status_code=400, detail="Формат файла не поддерживается")
             payload = await file.read(MAX_CHAT_FILE_SIZE + 1)
             if len(payload) > MAX_CHAT_FILE_SIZE:
-                raise HTTPException(status_code=413, detail="Размер файла не должен превышать 20 МБ")
+                raise HTTPException(status_code=413, detail="Размер файла не должен превышать 16 МБ.")
             if not payload:
                 raise HTTPException(status_code=400, detail="Нельзя отправить пустой файл")
             storage_root = os.getenv("ONLINE_DEKANAT_STORAGE_ROOT", "data/secure")
@@ -323,7 +384,7 @@ async def create_message(
                 "id": file_id,
                 "storage_name": encrypted_path.name,
                 "original_name": original_name[:180],
-                "media_type": "application/octet-stream",
+                "media_type": CHAT_FILE_MEDIA_TYPES.get(suffix, "application/octet-stream"),
                 "size": len(payload),
             }
         message = _collaboration.add_message(
@@ -343,6 +404,7 @@ async def create_message(
         if file is not None:
             await file.close()
     await _chat_sockets.broadcast(conversation_id, message)
+    await _chat_sockets.broadcast(_STAFF_CHAT_CHANNEL, message)
     return message
 
 
@@ -360,11 +422,17 @@ def download_chat_file(file_id: str, request: Request) -> Response:
     with storage.decrypted_temporary_file(encrypted_path) as temporary:
         payload = temporary.read_bytes()
     filename = quote(file_record["original_name"], safe="")
+    disposition = (
+        "inline"
+        if file_record["media_type"].startswith("image/")
+        or file_record["media_type"] == "application/pdf"
+        else "attachment"
+    )
     return Response(
         payload,
         media_type=file_record["media_type"],
         headers={
-            "Content-Disposition": f"attachment; filename*=UTF-8''{filename}",
+            "Content-Disposition": f"{disposition}; filename*=UTF-8''{filename}",
             "X-Content-Type-Options": "nosniff",
             "Cache-Control": "private, no-store",
         },
@@ -395,9 +463,34 @@ async def chat_websocket(websocket: WebSocket, conversation_id: str) -> None:
         _chat_sockets.disconnect(conversation_id, websocket)
 
 
+@app.websocket("/chat/staff/ws")
+async def staff_chat_websocket(websocket: WebSocket) -> None:
+    if not _origin_allowed(websocket.headers.get("origin"), websocket.headers.get("host", "")):
+        await websocket.close(code=1008)
+        return
+    session = websocket.scope.get("session", {})
+    user_id = session.get("user_id")
+    user = _collaboration.get_user(user_id) if isinstance(user_id, int) else None
+    if user is None:
+        await websocket.close(code=1008)
+        return
+    await _chat_sockets.connect(_STAFF_CHAT_CHANNEL, websocket)
+    try:
+        while True:
+            if await websocket.receive_text() == "ping":
+                await websocket.send_json({"type": "pong"})
+    except WebSocketDisconnect:
+        _chat_sockets.disconnect(_STAFF_CHAT_CHANNEL, websocket)
+
+
 @app.get("/ui", response_class=HTMLResponse)
 def ui() -> str:
     return UI_HTML
+
+
+@app.get("/staff", response_class=HTMLResponse)
+def staff_ui() -> str:
+    return STAFF_UI_HTML
 
 
 def _session_user(request: Request) -> dict | None:
@@ -420,12 +513,12 @@ def _require_admin(request: Request) -> dict:
 
 
 def _authorize_conversation(conversation_id: str, request: Request) -> dict | None:
-    user = _session_user(request)
-    if user and _collaboration.conversation_exists(conversation_id):
-        return user
     visitor_token = request.session.get("visitor_token")
     if visitor_token and _collaboration.visitor_owns(conversation_id, visitor_token):
         return None
+    user = _session_user(request)
+    if user and _collaboration.conversation_exists(conversation_id):
+        return user
     raise HTTPException(status_code=404, detail="Обращение не найдено")
 
 

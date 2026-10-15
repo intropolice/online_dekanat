@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from email.parser import BytesParser
 from email.policy import default
 from http import HTTPStatus
@@ -9,10 +10,12 @@ from pathlib import Path
 from urllib.parse import parse_qs
 
 from online_dekanat.pipeline import DeanOfficePipeline
-from online_dekanat.ui import UI_HTML
+from online_dekanat.ui import STAFF_UI_HTML, UI_HTML
 from online_dekanat.secure_storage import EncryptedStorage
 from online_dekanat.database import StudentDatabase
+from online_dekanat.uploads import MAX_UPLOAD_SIZE, validate_upload
 
+logger = logging.getLogger(__name__)
 
 class DeanOfficeHandler(BaseHTTPRequestHandler):
     server_version = "OnlineDekanatHTTP/0.1"
@@ -20,6 +23,9 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path in {"/", "/ui"}:
             self._send_text(UI_HTML, "text/html; charset=utf-8")
+            return
+        if self.path == "/staff":
+            self._send_text(STAFF_UI_HTML, "text/html; charset=utf-8")
             return
         if self.path == "/health":
             self._send_json({"status": "ok", "server": "simple"})
@@ -30,7 +36,7 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
             if path.parent == root and path.is_file():
                 self._send_bytes(path.read_bytes(), "image/png")
                 return
-            self._send_json({"error": "highlight not found"}, status=HTTPStatus.NOT_FOUND)
+            self._send_json({"error": "Фрагмент документа не найден."}, status=HTTPStatus.NOT_FOUND)
             return
         if self.path == "/students":
             self._send_json(StudentDatabase().list_students())
@@ -43,25 +49,37 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
                 return
             self._send_json(StudentDatabase().list_documents(student_id))
             return
-        self.send_error(HTTPStatus.NOT_FOUND)
+        self._send_json({"error": "Страница не найдена."}, status=HTTPStatus.NOT_FOUND)
 
     def do_POST(self) -> None:
         if self.path != "/process":
-            self.send_error(HTTPStatus.NOT_FOUND)
+            self._send_json({"error": "Страница не найдена."}, status=HTTPStatus.NOT_FOUND)
+            return
+        content_length = int(self.headers.get("Content-Length", "0"))
+        if content_length > MAX_UPLOAD_SIZE + 1024 * 1024:
+            self._send_json(
+                {"error": "Размер файла не должен превышать 16 МБ."},
+                status=HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+            )
             return
         try:
             fields, upload = self._read_request()
             if upload is None:
-                raise ValueError("file is required")
+                raise ValueError("Необходимо выбрать файл.")
             question = fields.get("question", "")
             if not question:
-                raise ValueError("question is required")
+                raise ValueError("Введите вопрос.")
             ocr = fields.get("ocr", "auto") or "auto"
             doc_type = fields.get("doc_type") or None
             result = DeanOfficePipeline(ocr_name=ocr).process(upload, question=question, doc_type=doc_type)
             self._send_json(result.to_dict())
         except Exception as exc:
-            self._send_json({"error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
+            if isinstance(exc, ValueError) and str(exc).startswith(("Необходимо", "Введите", "Формат файла", "Размер файла", "Файл пустой")):
+                message = str(exc)
+            else:
+                logger.exception("Не удалось обработать загруженный документ")
+                message = "Не удалось обработать документ. Проверьте формат и качество файла и попробуйте ещё раз."
+            self._send_json({"error": message}, status=HTTPStatus.BAD_REQUEST)
         finally:
             if "upload" in locals() and upload is not None:
                 Path(upload).unlink(missing_ok=True)
@@ -88,7 +106,13 @@ class DeanOfficeHandler(BaseHTTPRequestHandler):
             if not name:
                 continue
             if filename:
-                suffix = Path(filename).suffix or ".bin"
+                try:
+                    validate_upload(filename, len(payload))
+                except ValueError as exc:
+                    raise ValueError(str(exc)) from exc
+                if not payload:
+                    raise ValueError("Файл пустой.")
+                suffix = Path(filename).suffix.lower()
                 upload_path = str(EncryptedStorage().save(payload, suffix=suffix))
             else:
                 charset = part.get_content_charset() or "utf-8"

@@ -7,7 +7,7 @@ from typing import Any
 
 from online_dekanat.models import NOT_FOUND, DocumentCard, FieldValue
 
-DATE_PATTERN = r"(?<!\d)(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})(?!\d)"
+DATE_PATTERN = r"(?<!\d)(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d{1,2}\s+\d{1,2}\s+\d{2,4}|\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+\d{4})(?!\d)"
 
 
 def classify_document(text: str, document_types: dict[str, Any]) -> str:
@@ -85,11 +85,21 @@ def _extract_group(text: str) -> str:
 def _extract_date_period_part(part: str, text: str) -> str:
     lines = text.splitlines()
     explicit = "начало периода обучения" if part == "start" else "окончание периода обучения"
-    for line in lines:
-        normalized_line = line.casefold()
-        dates = re.findall(DATE_PATTERN, line, flags=re.IGNORECASE)
-        if explicit in normalized_line and dates:
-            return _normalize_date(dates[0 if part == "start" else -1]) or NOT_FOUND
+    for index, line in enumerate(lines):
+        date_matches = list(re.finditer(DATE_PATTERN, line, flags=re.IGNORECASE))
+        prefix = line[: date_matches[0].start()] if date_matches else line
+        if not _date_label_matches(prefix, explicit):
+            continue
+        if date_matches:
+            return _normalize_date(date_matches[0 if part == "start" else -1].group(1)) or NOT_FOUND
+        next_index = index + 1
+        while next_index < len(lines) and not lines[next_index].strip():
+            next_index += 1
+        if next_index < len(lines):
+            next_line = lines[next_index].strip(" \t:;,.")
+            next_dates = list(re.finditer(DATE_PATTERN, next_line, flags=re.IGNORECASE))
+            if len(next_dates) == 1 and next_line == next_dates[0].group(1):
+                return _normalize_date(next_dates[0].group(1)) or NOT_FOUND
     for line in lines:
         normalized_line = line.casefold()
         if "период обучения" not in normalized_line and "срок обучения" not in normalized_line:
@@ -156,7 +166,7 @@ def _normalize_date(value: str) -> str | None:
                 return datetime(int(words.group(3)), month, int(words.group(1))).strftime("%d.%m.%Y")
             except ValueError:
                 return None
-    formats = ("%d.%m.%Y", "%d/%m/%Y", "%d-%m-%Y", "%d.%m.%y", "%d/%m/%y", "%d-%m-%y", "%Y-%m-%d")
+    formats = ("%d.%m.%Y", "%d/%m/%Y", "%d-%m-%Y", "%d %m %Y", "%d.%m.%y", "%d/%m/%y", "%d-%m-%y", "%d %m %y", "%Y-%m-%d")
     for date_format in formats:
         try:
             return datetime.strptime(value, date_format).strftime("%d.%m.%Y")
@@ -167,12 +177,22 @@ def _normalize_date(value: str) -> str | None:
 
 def _extract_regex(patterns: list[str], text: str) -> str:
     for pattern in patterns:
-        match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE)
-        if match:
-            groups = [group.strip(" .:;\t\r\n") for group in match.groups() if group]
+        for line in text.splitlines():
+            match = re.search(pattern, line, flags=re.IGNORECASE | re.MULTILINE)
+            if not match:
+                continue
+            groups = [
+                group.strip(" .:;\t\r\n")
+                for group in match.groups()
+                if group and group.strip(" .:;\t\r\n")
+            ]
             if groups:
                 return " от ".join(groups) if len(groups) == 2 else " ".join(groups)
-            return match.group(0).strip()
+            if match.groups():
+                continue
+            value = match.group(0).strip(" .:;\t\r\n")
+            if value:
+                return value
     return NOT_FOUND
 
 

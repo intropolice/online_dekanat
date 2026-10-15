@@ -206,3 +206,21 @@ def test_group_highlight_does_not_match_different_group_number() -> None:
     )
 
     assert _regions_for_card([region], card) == []
+
+
+def test_study_period_end_highlight_matches_a_numeric_ocr_date_region() -> None:
+    region = OCRRegion("31.08.2026", (356, 548, 452, 565), 0)
+    card = DocumentCard(
+        doc_type="study_certificate",
+        doc_label="Справка об обучении",
+        fields={
+            "study_period_end": FieldValue(
+                "study_period_end", "Окончание периода обучения", "31.08.2026"
+            )
+        },
+        raw_text="",
+    )
+
+    highlighted = _regions_for_card([region], card)
+
+    assert highlighted == [region]
