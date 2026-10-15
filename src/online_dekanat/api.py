@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import logging
+from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 
@@ -9,23 +10,26 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, Web
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware import Middleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.middleware.sessions import SessionMiddleware
 
 from online_dekanat.collaboration import CollaborationStore, session_secret
+from online_dekanat.extraction import DocumentTypeNotDetectedError
 from online_dekanat.mail_delivery import (
     EmailDeliveryError,
     send_temporary_password,
 )
 from online_dekanat.pipeline import DeanOfficePipeline
-from online_dekanat.ui import STAFF_UI_HTML, UI_HTML
+from online_dekanat.ui import PROFILE_HTML, STAFF_UI_HTML, UI_HTML
 from online_dekanat.secure_storage import EncryptedStorage
 from online_dekanat.database import StudentDatabase
 from online_dekanat.uploads import MAX_UPLOAD_SIZE, validate_upload
 
 logger = logging.getLogger(__name__)
 MAX_CHAT_FILE_SIZE = MAX_UPLOAD_SIZE
+MAX_PROFILE_AVATAR_SIZE = 2 * 1024 * 1024
 ALLOWED_CHAT_EXTENSIONS = {
     ".bmp", ".doc", ".docx", ".jpeg", ".jpg", ".pdf", ".png",
     ".ppt", ".pptx", ".tif", ".tiff", ".txt", ".webp", ".xls", ".xlsx",
@@ -73,6 +77,27 @@ class PasswordChange(BaseModel):
     new_password: str
 
 
+def _sanitize_profile_avatar(data: bytes) -> bytes:
+    try:
+        with Image.open(BytesIO(data)) as image:
+            if image.format not in {"JPEG", "PNG", "WEBP"}:
+                raise ValueError("Аватар должен быть изображением JPG, PNG или WEBP")
+            if image.width * image.height > 16_000_000:
+                raise ValueError("Разрешение аватара не должно превышать 16 мегапикселей")
+            image.load()
+            normalized = ImageOps.exif_transpose(image)
+            normalized.thumbnail((512, 512))
+            mode = "RGBA" if "A" in normalized.getbands() else "RGB"
+            normalized = normalized.convert(mode)
+            output = BytesIO()
+            normalized.save(output, format="WEBP", quality=85, method=6)
+            return output.getvalue()
+    except ValueError:
+        raise
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
+        raise ValueError("Не удалось прочитать изображение аватара") from exc
+
+
 class StaffInvitation(BaseModel):
     email: str
 
@@ -92,12 +117,17 @@ class ChatSockets:
             if not connections:
                 self._connections.pop(conversation_id, None)
 
-    async def broadcast(self, conversation_id: str, message: dict) -> None:
+    async def broadcast_event(self, conversation_id: str, event: dict) -> None:
         for websocket in tuple(self._connections.get(conversation_id, ())):
             try:
-                await websocket.send_json({"type": "message", "message": message})
+                await websocket.send_json(event)
             except (RuntimeError, WebSocketDisconnect):
                 self.disconnect(conversation_id, websocket)
+
+    async def broadcast(self, conversation_id: str, message: dict) -> None:
+        await self.broadcast_event(
+            conversation_id, {"type": "message", "message": message}
+        )
 
 
 _chat_sockets = ChatSockets()
@@ -127,6 +157,7 @@ async def limit_chat_upload_body(
         request.method == "POST"
         and (
             request.url.path == "/process"
+            or request.url.path == "/auth/profile"
             or (
                 request.url.path.startswith("/chat/conversations/")
                 and request.url.path.endswith("/messages")
@@ -134,9 +165,19 @@ async def limit_chat_upload_body(
         )
     ):
         content_length = request.headers.get("content-length")
-        if content_length and content_length.isdigit() and int(content_length) > MAX_UPLOAD_SIZE + 1024 * 1024:
+        max_size = (
+            MAX_PROFILE_AVATAR_SIZE + 64 * 1024
+            if request.url.path == "/auth/profile"
+            else MAX_UPLOAD_SIZE + 1024 * 1024
+        )
+        if content_length and content_length.isdigit() and int(content_length) > max_size:
+            message = (
+                "Размер аватара не должен превышать 2 МБ."
+                if request.url.path == "/auth/profile"
+                else "Размер файла не должен превышать 16 МБ."
+            )
             return JSONResponse(
-                {"detail": "Размер файла не должен превышать 16 МБ."},
+                {"detail": message},
                 status_code=413,
             )
     return await call_next(request)
@@ -239,6 +280,69 @@ def change_password(payload: PasswordChange, request: Request) -> dict:
     return {"user": _session_user(request)}
 
 
+@app.get("/auth/profile")
+def get_profile(request: Request) -> dict:
+    return {"user": _require_staff(request)}
+
+
+@app.post("/auth/profile")
+async def update_profile(
+    request: Request,
+    full_name: str = Form(...),
+    current_password: str = Form(""),
+    new_password: str = Form(""),
+    remove_avatar: bool = Form(False),
+    avatar: UploadFile | None = File(None),
+) -> dict:
+    _check_same_origin(request)
+    user = _require_staff(request)
+    avatar_data = None
+    avatar_media_type = None
+    if avatar is not None and avatar.filename:
+        raw_avatar = await avatar.read(MAX_PROFILE_AVATAR_SIZE + 1)
+        if len(raw_avatar) > MAX_PROFILE_AVATAR_SIZE:
+            raise HTTPException(status_code=413, detail="Размер аватара не должен превышать 2 МБ.")
+        try:
+            avatar_data = _sanitize_profile_avatar(raw_avatar)
+            avatar_media_type = "image/webp"
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+    try:
+        updated_user = _collaboration.update_profile(
+            user["id"],
+            full_name,
+            avatar=avatar_data,
+            avatar_media_type=avatar_media_type,
+            remove_avatar=remove_avatar,
+            current_password=current_password,
+            new_password=new_password,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {"user": updated_user}
+
+
+@app.get("/auth/profile/avatar")
+def profile_avatar(request: Request) -> Response:
+    user = _require_staff(request)
+    avatar = _collaboration.get_profile_avatar(user["id"])
+    if avatar is None:
+        raise HTTPException(status_code=404, detail="Аватар не задан")
+    data, media_type = avatar
+    return Response(
+        content=data,
+        media_type=media_type,
+        headers={
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
+
+
 @app.post("/process")
 async def process_document(
     file: UploadFile = File(...),
@@ -265,6 +369,8 @@ async def process_document(
         return result.to_dict()
     except HTTPException:
         raise
+    except DocumentTypeNotDetectedError as exc:
+        return JSONResponse({"error": str(exc)}, status_code=422)
     except Exception as exc:
         logger.exception("Не удалось обработать загруженный документ")
         return JSONResponse(
@@ -327,8 +433,27 @@ def create_conversation(request: Request) -> dict:
 
 @app.get("/chat/conversations")
 def list_conversations(request: Request) -> list[dict]:
-    _require_staff(request)
-    return _collaboration.list_conversations()
+    user = _require_staff(request)
+    return _collaboration.list_conversations(staff_id=user["id"])
+
+
+@app.post("/chat/conversations/{conversation_id}/claim")
+async def claim_conversation(conversation_id: str, request: Request) -> dict:
+    _check_same_origin(request)
+    user = _require_staff(request)
+    try:
+        conversation = _collaboration.claim_conversation(
+            conversation_id, user["id"]
+        )
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    await _chat_sockets.broadcast_event(
+        _STAFF_CHAT_CHANNEL,
+        {"type": "conversation_claimed", "conversation_id": conversation_id},
+    )
+    return {"conversation": conversation}
 
 
 @app.get("/chat/conversations/{conversation_id}/messages")
@@ -394,7 +519,17 @@ async def create_message(
             sender_id=user["id"] if user else None,
             file=stored_file,
         )
+    except PermissionError as exc:
+        if encrypted_path is not None:
+            encrypted_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except LookupError as exc:
+        if encrypted_path is not None:
+            encrypted_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
+        if encrypted_path is not None:
+            encrypted_path.unlink(missing_ok=True)
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception:
         if encrypted_path is not None:
@@ -449,7 +584,7 @@ async def chat_websocket(websocket: WebSocket, conversation_id: str) -> None:
     user = _collaboration.get_user(user_id) if isinstance(user_id, int) else None
     visitor_token = session.get("visitor_token")
     if not (
-        (user and _collaboration.conversation_exists(conversation_id))
+        (user and _collaboration.staff_can_access(conversation_id, user["id"]))
         or (visitor_token and _collaboration.visitor_owns(conversation_id, visitor_token))
     ):
         await websocket.close(code=1008)
@@ -493,6 +628,11 @@ def staff_ui() -> str:
     return STAFF_UI_HTML
 
 
+@app.get("/staff/profile", response_class=HTMLResponse)
+def staff_profile_ui() -> str:
+    return PROFILE_HTML
+
+
 def _session_user(request: Request) -> dict | None:
     user_id = request.session.get("user_id")
     return _collaboration.get_user(user_id) if isinstance(user_id, int) else None
@@ -517,7 +657,7 @@ def _authorize_conversation(conversation_id: str, request: Request) -> dict | No
     if visitor_token and _collaboration.visitor_owns(conversation_id, visitor_token):
         return None
     user = _session_user(request)
-    if user and _collaboration.conversation_exists(conversation_id):
+    if user and _collaboration.staff_can_access(conversation_id, user["id"]):
         return user
     raise HTTPException(status_code=404, detail="Обращение не найдено")
 

@@ -13,6 +13,7 @@ services:
     environment:
       ONLINE_DEKANAT_STORAGE_KEY: ${ONLINE_DEKANAT_STORAGE_KEY:-}
       ONLINE_DEKANAT_RESULTS_PATH: /app/data/results.json
+      ONLINE_DEKANAT_CHAT_LOG_DIR: ${ONLINE_DEKANAT_CHAT_LOG_DIR:-/app/data/conversations}
       ONLINE_DEKANAT_HTTPS_ONLY: ${ONLINE_DEKANAT_HTTPS_ONLY:-false}
       BREVO_API_KEY: ${BREVO_API_KEY:-}
       BREVO_SENDER_EMAIL: ${BREVO_SENDER_EMAIL:-}
@@ -27,7 +28,6 @@ services:
       SMTP_TIMEOUT_SECONDS: ${SMTP_TIMEOUT_SECONDS:-15}
     volumes:
       - app_data:/app/data
-      - ./results.json:/app/data/results.json
     init: true
     restart: unless-stopped
     healthcheck:

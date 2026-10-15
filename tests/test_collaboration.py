@@ -1,7 +1,10 @@
 from pathlib import Path
 import sqlite3
+import json
+from io import BytesIO
 
 import pytest
+from PIL import Image
 
 from online_dekanat.collaboration import CollaborationStore
 
@@ -9,10 +12,12 @@ from online_dekanat.collaboration import CollaborationStore
 def test_employee_email_validation_and_password_policy(tmp_path: Path) -> None:
     store = CollaborationStore(tmp_path / "database.sqlite")
     admin = store.create_admin("ADMIN@ADM.RKSI.RU", "a sufficiently long password")
+    numeric_password_user = store.create_staff("digits@adm.rksi.ru", "987654321098")
 
     assert admin["role"] == "admin"
     assert store.authenticate("admin@adm.rksi.ru", "a sufficiently long password")["id"] == admin["id"]
     assert store.authenticate("admin@adm.rksi.ru", "wrong password") is None
+    assert store.authenticate(numeric_password_user["email"], "987654321098") is not None
     assert store.validate_email("employee@gmail.com") == "employee@gmail.com"
     assert store.validate_email("employee@mail.ru") == "employee@mail.ru"
     with pytest.raises(ValueError, match="корректный адрес"):
@@ -21,6 +26,102 @@ def test_employee_email_validation_and_password_policy(tmp_path: Path) -> None:
         store.create_admin("another@adm.rksi.ru", "another sufficiently long password")
     with pytest.raises(ValueError, match="не менее 12"):
         store.create_staff("employee@adm.rksi.ru", "short")
+
+
+def test_staff_profile_stores_encrypted_name_avatar_and_password(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setenv("ONLINE_DEKANAT_DB_PATH", str(tmp_path / "database.sqlite"))
+    monkeypatch.setenv("ONLINE_DEKANAT_STORAGE_ROOT", str(tmp_path / "secure"))
+    monkeypatch.setenv(
+        "ONLINE_DEKANAT_SESSION_SECRET", "test-session-secret-that-is-long-enough"
+    )
+
+    from online_dekanat import api
+
+    store = CollaborationStore(tmp_path / "database.sqlite")
+    staff = store.create_staff("profile@adm.rksi.ru", "a sufficiently secure password")
+    monkeypatch.setattr(api, "_collaboration", store)
+
+    image = BytesIO()
+    Image.new("RGB", (32, 32), "navy").save(image, format="PNG")
+
+    with TestClient(api.app) as client:
+        assert client.get("/auth/profile").status_code == 401
+        profile_page = client.get("/staff/profile")
+        assert profile_page.status_code == 200
+        assert 'id="profile-theme-toggle"' in profile_page.text
+        assert 'id="choose-avatar"' in profile_page.text
+        assert 'id="profile-email" readonly' not in profile_page.text
+        assert profile_page.text.index("</form>") < profile_page.text.index(
+            '<form id="password-form">'
+        )
+        assert 'id="change-password" type="submit">Изменить пароль' in profile_page.text
+        assert client.post(
+            "/auth/login",
+            json={
+                "email": staff["email"],
+                "password": "a sufficiently secure password",
+            },
+        ).status_code == 200
+
+        saved_without_password = client.post(
+            "/auth/profile",
+            data={"full_name": "Иванов Иван Иванович"},
+        )
+        assert saved_without_password.status_code == 200
+        assert store.authenticate(
+            staff["email"], "a sufficiently secure password"
+        ) is not None
+
+        updated = client.post(
+            "/auth/profile",
+            data={
+                "full_name": "Иванов Иван Иванович",
+                "current_password": "a sufficiently secure password",
+                "new_password": "a new and very secure password",
+            },
+            files={"avatar": ("avatar.png", image.getvalue(), "image/png")},
+        )
+        assert updated.status_code == 200
+        user = updated.json()["user"]
+        assert user["full_name"] == "Иванов Иван Иванович"
+        assert user["avatar_url"] == "/auth/profile/avatar"
+        assert store.authenticate(staff["email"], "a sufficiently secure password") is None
+        assert store.authenticate(staff["email"], "a new and very secure password") is not None
+
+        avatar = client.get(user["avatar_url"])
+        assert avatar.status_code == 200
+        assert avatar.headers["content-type"] == "image/webp"
+        assert avatar.content.startswith(b"RIFF")
+
+        with sqlite3.connect(store.path) as db:
+            stored_name, stored_avatar = db.execute(
+                "SELECT profile_name,avatar FROM staff_users WHERE id=?",
+                (staff["id"],),
+            ).fetchone()
+        assert "Иванов".encode("utf-8") not in stored_name
+        assert b"RIFF" not in stored_avatar
+
+        rejected = client.post(
+            "/auth/profile",
+            data={
+                "full_name": "Не должно сохраниться",
+                "current_password": "wrong password",
+                "new_password": "another secure new password",
+            },
+        )
+        assert rejected.status_code == 400
+        assert client.get("/auth/profile").json()["user"]["full_name"] == "Иванов Иван Иванович"
+
+        removed = client.post(
+            "/auth/profile",
+            data={"full_name": "Иванов Иван Иванович", "remove_avatar": "true"},
+        )
+        assert removed.status_code == 200
+        assert removed.json()["user"]["avatar_url"] is None
 
 
 def test_registration_creates_account_and_delivers_one_time_password(tmp_path: Path) -> None:
@@ -81,6 +182,66 @@ def test_visitor_token_scopes_conversation_access_and_messages(tmp_path: Path) -
     assert "Здравствуйте".encode("utf-8") not in stored_body
 
 
+def test_claiming_conversation_is_exclusive_and_updates_its_json_log(
+    tmp_path: Path,
+) -> None:
+    store = CollaborationStore(tmp_path / "database.sqlite")
+    first_staff = store.create_staff("first@adm.rksi.ru", "first secure password")
+    second_staff = store.create_staff("second@adm.rksi.ru", "second secure password")
+    conversation = store.create_conversation("visitor-secret")
+
+    claimed = store.claim_conversation(conversation["id"], first_staff["id"])
+
+    assert claimed["assigned_staff_id"] == first_staff["id"]
+    assert claimed["code"] == conversation["code"]
+    assert [
+        item["id"] for item in store.list_conversations(staff_id=first_staff["id"])
+    ] == [conversation["id"]]
+    assert store.list_conversations(staff_id=second_staff["id"]) == []
+    assert not store.staff_can_access(conversation["id"], second_staff["id"])
+    with pytest.raises(ValueError, match="уже закреплено"):
+        store.claim_conversation(conversation["id"], second_staff["id"])
+    with pytest.raises(PermissionError, match="закреплено"):
+        store.add_message(
+            conversation["id"],
+            "staff",
+            "Чужой ответ",
+            sender_id=second_staff["id"],
+        )
+    store.add_message(
+        conversation["id"],
+        "staff",
+        "Ответ закрепленного сотрудника",
+        sender_id=first_staff["id"],
+    )
+
+    log_path = tmp_path / "conversations" / f"{conversation['code']}.json"
+    log = json.loads(log_path.read_text(encoding="utf-8"))
+    assert log["conversation"]["assigned_staff_email"] == first_staff["email"]
+    assert [message["body"] for message in log["messages"]] == [
+        "Ответ закрепленного сотрудника"
+    ]
+    assert list((tmp_path / "conversations").glob("*.json")) == [log_path]
+
+
+def test_conversation_cannot_be_claimed_after_staff_has_replied(
+    tmp_path: Path,
+) -> None:
+    store = CollaborationStore(tmp_path / "database.sqlite")
+    staff = store.create_staff("staff@adm.rksi.ru", "a secure password here")
+    another_staff = store.create_staff("another@adm.rksi.ru", "another secure password")
+    conversation = store.create_conversation("visitor-secret")
+    store.add_message(
+        conversation["id"],
+        "staff",
+        "Ответ сотрудника",
+        sender_id=staff["id"],
+    )
+
+    with pytest.raises(ValueError, match="уже закреплено"):
+        store.claim_conversation(conversation["id"], another_staff["id"])
+
+
 def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -111,7 +272,20 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
     ):
         from starlette.websockets import WebSocketDisconnect
 
-        assert 'body class="staff-page"' in staff.get("/staff").text
+        staff_page = staff.get("/staff").text
+        assert 'body class="staff-page"' in staff_page
+        assert '.staff-toolbar-tools [hidden]{display:none!important}' in staff_page
+        for element_id in (
+            "staff-notifications",
+            "staff-sound-toggle",
+            "staff-profile-button",
+            "staff-logout",
+        ):
+            assert f'id="{element_id}"' in staff_page
+            assert f'id="{element_id}"' in staff_page and " hidden" in staff_page[
+                staff_page.index(f'id="{element_id}"') :
+                staff_page.index(f'id="{element_id}"') + 150
+            ]
         assert 'href="/staff"' in visitor.get("/ui").text
         with pytest.raises(WebSocketDisconnect):
             with other.websocket_connect("/chat/staff/ws"):
@@ -163,20 +337,30 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
             f"/chat/conversations/{staff_conversation}/messages"
         ).status_code == 404
 
-        conversation = visitor.post("/chat/conversations").json()["conversation"]["id"]
+        created_conversation = visitor.post("/chat/conversations").json()["conversation"]
+        conversation = created_conversation["id"]
+        conversation_log = (
+            tmp_path / "conversations" / f"{created_conversation['code']}.json"
+        )
+        assert conversation_log.is_file()
         uploaded = visitor.post(
             f"/chat/conversations/{conversation}/messages",
-            data={"body": "Проверьте файл"},
-            files={"file": ("document.txt", b"private attachment", "text/plain")},
+            data={"body": "Проверьте документ"},
+            files={"file": ("document.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         )
         assert uploaded.status_code == 200
+        conversation_record = json.loads(conversation_log.read_text(encoding="utf-8"))
+        assert conversation_record["messages"][0]["body"] == "Проверьте документ"
         file_info = uploaded.json()["file"]
-        assert visitor.get(file_info["url"]).content == b"private attachment"
+        assert file_info["media_type"] == "application/pdf"
+        file_response = visitor.get(file_info["url"])
+        assert file_response.content == b"%PDF-1.4\n%%EOF"
+        assert file_response.headers["content-disposition"].startswith("inline;")
         assert other.get(file_info["url"]).status_code == 404
         assert other.get(f"/chat/conversations/{conversation}/messages").status_code == 404
 
         assert staff.get("/chat/conversations").json()[0]["id"] == conversation
-        assert staff.get(f"/chat/conversations/{conversation}/messages").json()[0]["body"] == "Проверьте файл"
+        assert staff.get(f"/chat/conversations/{conversation}/messages").json()[0]["body"] == "Проверьте документ"
         other_conversation = other.post("/chat/conversations").json()["conversation"]["id"]
         with visitor.websocket_connect(f"/chat/ws/{conversation}") as visitor_socket:
             with staff.websocket_connect(f"/chat/ws/{conversation}") as staff_socket:
@@ -199,9 +383,11 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
                     assert event["conversation_id"] == other_conversation
                     staff_reply = staff.post(
                         f"/chat/conversations/{conversation}/messages",
-                        data={"body": "Ответ сотрудника"},
+                        data={"body": "Ответ сотрудника", "sender_kind": "staff"},
                     )
                     assert staff_reply.status_code == 200
+                    assert staff_reply.json()["sender_kind"] == "staff"
+                    assert staff_reply.json()["sender_name"] == registration_email
                     assert visitor_socket.receive_json()["message"]["body"] == "Ответ сотрудника"
 
         assert visitor.get(f"/chat/conversations/{conversation}/messages").json()[-1]["body"] == "Ответ сотрудника"
@@ -223,6 +409,28 @@ def test_chat_api_authenticates_staff_registers_emails_and_protects_attachments(
             },
         ).status_code == 200
         assert other.get("/auth/users").status_code == 403
+
+        claimable = store.create_conversation("claimable-visitor")
+        claim_response = staff.post(
+            f"/chat/conversations/{claimable['id']}/claim"
+        )
+        assert claim_response.status_code == 200
+        assert claim_response.json()["conversation"]["assigned_staff_id"] == store.authenticate(
+            registration_email, "a permanent and very secure password"
+        )["id"]
+        assert claimable["id"] not in {
+            item["id"] for item in other.get("/chat/conversations").json()
+        }
+        assert other.get(
+            f"/chat/conversations/{claimable['id']}/messages"
+        ).status_code == 404
+        assert other.post(
+            f"/chat/conversations/{claimable['id']}/messages",
+            data={"body": "Чужой ответ", "sender_kind": "staff"},
+        ).status_code == 409
+        assert staff.get(
+            f"/chat/conversations/{claimable['id']}/messages"
+        ).status_code == 200
         assert other.get("/students").status_code == 200
         assert other.post(
             "/auth/change-password",

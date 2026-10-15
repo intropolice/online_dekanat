@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw
 from online_dekanat.io import load_pages
 from online_dekanat.ocr.base import OCRRegion
 from online_dekanat.quality import (
+    _page_rotation,
     normalize_orientation,
     prepare_for_ocr,
     rescale_ocr_regions,
@@ -30,6 +31,24 @@ def test_normalize_orientation_rotates_pages_before_visual_checks(
     finally:
         if oriented != source:
             oriented.unlink(missing_ok=True)
+
+
+def test_page_rotation_ignores_low_confidence_orientation_results() -> None:
+    class OCR:
+        @staticmethod
+        def image_to_osd(*_args, **_kwargs):
+            return "Rotate: 90\nOrientation confidence: 2.86\n"
+
+    assert _page_rotation(Image.new("RGB", (768, 1085), "white"), OCR()) == 0
+
+
+def test_page_rotation_applies_confident_orientation_results() -> None:
+    class OCR:
+        @staticmethod
+        def image_to_osd(*_args, **_kwargs):
+            return "Rotate: 90\nOrientation confidence: 8.2\n"
+
+    assert _page_rotation(Image.new("RGB", (768, 1085), "white"), OCR()) == 270
 
 
 def test_load_pages_reads_all_frames_in_oriented_tiff(tmp_path: Path) -> None:

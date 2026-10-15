@@ -6,7 +6,7 @@ import re
 from uuid import uuid4
 from datetime import datetime
 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
 from PIL import ImageOps
 
 from online_dekanat.ocr.base import OCRRegion
@@ -43,28 +43,6 @@ def create_highlights(
         path = root / f"{uuid4().hex}-page-{page_index + 1}.png"
         canvas.save(path, format="PNG", optimize=True)
         output.append(str(path))
-    for region in visual:
-        if region.text != "signature" or region.page < 0 or region.page >= len(pages):
-            continue
-        page = pages[region.page].convert("RGB")
-        x1, y1, x2, y2 = region.bbox
-        padding_x = max(16, int((x2 - x1) * 0.2))
-        padding_y = max(12, int((y2 - y1) * 0.35))
-        crop = page.crop(
-            (
-                max(0, int(x1 - padding_x)),
-                max(0, int(y1 - padding_y)),
-                min(page.width, int(x2 + padding_x)),
-                min(page.height, int(y2 + padding_y)),
-            )
-        )
-        crop = crop.resize(
-            (crop.width * 2, crop.height * 2),
-            Image.Resampling.LANCZOS,
-        )
-        path = root / f"{uuid4().hex}-signature-detail.png"
-        crop.save(path, format="PNG", optimize=True)
-        output.append(str(path))
     return output
 
 
@@ -88,7 +66,7 @@ def apply_visual_presence(source: str | Path, regions: list[OCRRegion], card: Do
 
 def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRRegion]:
     selected: dict[int, OCRRegion] = {}
-    queries: list[tuple[list[str], bool]] = []
+    queries: list[tuple[list[str], bool, int]] = []
     for field in card.fields.values():
         if not field.is_found:
             continue
@@ -106,10 +84,17 @@ def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRR
         else:
             tokens = _tokens(value)
             if tokens:
-                queries.append((tokens, field.key == "group"))
+                label_tokens = _tokens(field.title) if field.key == "course" else []
+                queries.append(
+                    (
+                        label_tokens + tokens,
+                        field.key == "group",
+                        len(label_tokens),
+                    )
+                )
                 date_tokens = _date_word_tokens(value)
                 if date_tokens:
-                    queries.append((date_tokens, False))
+                    queries.append((date_tokens, False, 0))
 
     for page in sorted({region.page for region in regions}):
         page_regions = [region for region in regions if region.page == page]
@@ -117,14 +102,15 @@ def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRR
         for region_index, region in enumerate(page_regions):
             for match in re.finditer(r"[a-zа-яё0-9]+", region.text.casefold()):
                 stream.append((match.group(), region_index, match.start(), match.end()))
-        for query, group_code in queries:
+        for query, group_code, value_offset in queries:
             width = len(query)
             for start in range(0, len(stream) - width + 1):
                 candidate = [item[0] for item in stream[start : start + width]]
                 if not _highlight_tokens_match(query, candidate, group_code=group_code):
                     continue
-                matched = stream[start : start + width]
-                if query and query[-1].isdigit() and start + width < len(stream) and stream[start + width][0] in {"год", "года", "году"}:
+                value_tokens = query[value_offset:]
+                matched = stream[start + value_offset : start + width]
+                if value_tokens and value_tokens[-1].isdigit() and start + width < len(stream) and stream[start + width][0] in {"год", "года", "году"}:
                     matched = [*matched, stream[start + width]]
                 grouped: dict[int, list[tuple[int, int]]] = {}
                 for _, region_index, char_start, char_end in matched:
@@ -134,6 +120,14 @@ def _regions_for_card(regions: list[OCRRegion], card: DocumentCard) -> list[OCRR
                     char_start = min(span[0] for span in spans)
                     char_end = max(span[1] for span in spans)
                     refined = _refine_bbox(region, char_start, char_end)
+                    existing = selected.get(id(region))
+                    if existing:
+                        refined = (
+                            min(existing.bbox[0], refined[0]),
+                            min(existing.bbox[1], refined[1]),
+                            max(existing.bbox[2], refined[2]),
+                            max(existing.bbox[3], refined[3]),
+                        )
                     selected[id(region)] = replace(region, bbox=refined)
                 break
     return list(selected.values())
@@ -189,6 +183,22 @@ def _visual_regions(pages: list[Image.Image], regions: list[OCRRegion], card: Do
                 if any(word in region.text.casefold() for word in label_words)
                 and not _is_explanatory_label_region(region, page_regions)
             ]
+            if role == "signature":
+                if colored_components is None:
+                    colored_components = _colored_ink_components(page)
+                bbox = _find_colored_signature_bbox(page, colored_components)
+                if bbox is not None and (
+                    not labels
+                    or any(
+                        _same_signature_line(
+                            bbox,
+                            _signature_label_bbox(label, page_regions),
+                        )
+                        for label in labels
+                    )
+                ):
+                    output.append(OCRRegion(role, bbox, page_index))
+                    continue
             candidates: list[tuple[float, tuple[float, float, float, float]]] = []
             for label in labels:
                 label_bbox = _signature_label_bbox(label, page_regions) if role == "signature" else label.bbox
@@ -281,6 +291,20 @@ def _signature_label_bbox(
             center = (y1 + y2) / 2
 
     return x1, y1, x2, y2
+
+
+def _same_signature_line(
+    signature_bbox: tuple[float, float, float, float],
+    label_bbox: tuple[float, float, float, float],
+) -> bool:
+    signature_center = (signature_bbox[1] + signature_bbox[3]) / 2
+    label_center = (label_bbox[1] + label_bbox[3]) / 2
+    tolerance = max(
+        6.0,
+        ((signature_bbox[3] - signature_bbox[1]) + (label_bbox[3] - label_bbox[1]))
+        / 2,
+    )
+    return abs(signature_center - label_center) <= tolerance
 
 
 def _find_visual_bbox(page: Image.Image, label_bbox: tuple[float, float, float, float], role: str) -> tuple[float, float, float, float] | None:

@@ -1,39 +1,54 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 from pathlib import Path
 from typing import Any
 
+logger = logging.getLogger(__name__)
 
-def append_result(payload: dict[str, Any], path: str | Path | None = None) -> None:
+
+def append_result(payload: dict[str, Any], path: str | Path | None = None) -> bool:
     target = Path(path or os.getenv("ONLINE_DEKANAT_RESULTS_PATH", "results.json"))
-    target.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        logger.warning("Не удалось подготовить файл журнала результатов %s", target, exc_info=True)
+        return False
+
     try:
         records = json.loads(target.read_text(encoding="utf-8")) if target.exists() else []
         if not isinstance(records, list):
             records = []
-    except (OSError, json.JSONDecodeError):
+    except json.JSONDecodeError:
         records = []
+    except OSError:
+        logger.warning("Не удалось прочитать журнал результатов %s", target, exc_info=True)
+        return False
     records.append(payload)
-    
-    # ИСПРАВЛЕНИЕ: Используем системную папку /tmp для создания временного файла,
-    # чтобы у Docker не возникало ошибки Permission Denied при записи в корень /app
-    fd, temporary = tempfile.mkstemp(prefix="results-", suffix=".json", dir=None)
+
+    temporary: Path | None = None
     try:
+        fd, temporary_name = tempfile.mkstemp(
+            prefix="results-", suffix=".json", dir=target.parent
+        )
+        temporary = Path(temporary_name)
         with os.fdopen(fd, "w", encoding="utf-8") as file:
             json.dump(records, file, ensure_ascii=False, indent=2)
             file.write("\n")
-        
-        # Переносим готовый файл на его законное место
         try:
             os.replace(temporary, target)
         except OSError:
-            # На случай, если /tmp и target на разных файловых системах внутри Docker
-            Path(target).write_text(Path(temporary).read_text(encoding="utf-8"), encoding="utf-8")
+            target.write_text(temporary.read_text(encoding="utf-8"), encoding="utf-8")
+        return True
+    except OSError:
+        logger.warning("Не удалось записать журнал результатов %s", target, exc_info=True)
+        return False
     finally:
-        Path(temporary).unlink(missing_ok=True)
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 def submission_record(payload: dict[str, Any]) -> dict[str, Any]:
     """Keep the submission ledger useful without duplicating student PII."""

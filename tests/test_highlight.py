@@ -2,7 +2,12 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from online_dekanat.highlight import _regions_for_card, apply_visual_presence
+from online_dekanat.highlight import (
+    _regions_for_card,
+    _visual_regions,
+    apply_visual_presence,
+    create_highlights,
+)
 from online_dekanat.models import NOT_FOUND, DocumentCard, FieldValue
 from online_dekanat.ocr.base import OCRRegion
 from online_dekanat.quality import normalize_orientation
@@ -73,6 +78,51 @@ def test_real_signature_is_detected_next_to_signature_disclaimer(tmp_path: Path)
     apply_visual_presence(source, regions, card)
 
     assert card.fields["signature"].value == "есть"
+
+
+def test_highlights_do_not_create_a_separate_signature_detail(tmp_path: Path) -> None:
+    source = tmp_path / "signature_detail.png"
+    regions, card = _document_with_signature_disclaimer(source, signed=True)
+
+    highlights = create_highlights(source, regions, card, tmp_path / "highlights")
+
+    assert len(highlights) == 1
+    assert all("signature-detail" not in path for path in highlights)
+
+
+def test_signature_highlight_prefers_handwriting_to_local_label_candidate(
+    monkeypatch,
+) -> None:
+    image = Image.new("RGB", (559, 210), "#10212a")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((34, 0, 497, 197), fill="white")
+    font = ImageFont.load_default(size=10)
+    draw.text((70, 45), "Signature staff:", fill="#333333", font=font)
+    draw.line(
+        [(212, 47), (220, 43), (224, 50), (230, 41), (235, 50), (243, 44), (250, 51), (257, 42), (264, 48), (279, 44)],
+        fill="#244c7b",
+        width=2,
+    )
+    regions = [
+        OCRRegion("Подпись", (70, 45, 100, 54), 0),
+        OCRRegion("сотрудника:", (101, 45, 147, 54), 0),
+    ]
+    card = DocumentCard(
+        doc_type="study_certificate",
+        doc_label="Справка об обучении",
+        fields={"signature": FieldValue("signature", "Подпись")},
+        raw_text="",
+    )
+    monkeypatch.setattr(
+        "online_dekanat.highlight._find_visual_bbox",
+        lambda *_args: (101, 45, 147, 54),
+    )
+
+    highlighted = _visual_regions([image], regions, card)
+
+    assert len(highlighted) == 1
+    assert highlighted[0].bbox[0] >= 200
+    assert highlighted[0].bbox[2] <= 300
 
 
 def test_signature_is_detected_in_screenshot_with_dark_side_bars(tmp_path: Path) -> None:
@@ -208,6 +258,29 @@ def test_group_highlight_does_not_match_different_group_number() -> None:
     assert _regions_for_card([region], card) == []
 
 
+def test_group_and_course_highlights_do_not_overlap_on_the_group_suffix() -> None:
+    group_region = OCRRegion("Учебная группа: ЖР-23-3", (0, 10, 160, 20), 0)
+    course_region = OCRRegion("Курс: 3", (0, 30, 50, 40), 0)
+    card = DocumentCard(
+        doc_type="academic_leave_application",
+        doc_label="Заявление на академический отпуск",
+        fields={
+            "group": FieldValue("group", "Группа", "ЖР-23-3"),
+            "course": FieldValue("course", "Курс", "3"),
+        },
+        raw_text="",
+    )
+
+    highlighted = _regions_for_card([group_region, course_region], card)
+
+    assert len(highlighted) == 2
+    group_highlight, course_highlight = highlighted
+    assert group_highlight.bbox[0] > group_region.bbox[0]
+    assert group_highlight.bbox[2] == group_region.bbox[2]
+    assert course_highlight.bbox[0] > course_region.bbox[0]
+    assert course_highlight.bbox[2] == course_region.bbox[2]
+
+
 def test_study_period_end_highlight_matches_a_numeric_ocr_date_region() -> None:
     region = OCRRegion("31.08.2026", (356, 548, 452, 565), 0)
     card = DocumentCard(
@@ -224,3 +297,27 @@ def test_study_period_end_highlight_matches_a_numeric_ocr_date_region() -> None:
     highlighted = _regions_for_card([region], card)
 
     assert highlighted == [region]
+
+
+def test_empty_fuzzy_labeled_fields_do_not_highlight_the_label() -> None:
+    from online_dekanat.config import load_document_types
+    from online_dekanat.extraction import extract_card
+
+    types = load_document_types()
+    study_card = extract_card(
+        "Направление подготовкИ: ____________________",
+        types,
+        "study_certificate",
+    )
+    leave_card = extract_card(
+        "Причина отпусka: ____________________",
+        types,
+        "academic_leave_application",
+    )
+    regions = [
+        OCRRegion("Направление подготовкИ:", (10, 10, 130, 20), 0),
+        OCRRegion("Причина отпусka:", (10, 30, 100, 40), 0),
+    ]
+
+    assert _regions_for_card(regions, study_card) == []
+    assert _regions_for_card(regions, leave_card) == []

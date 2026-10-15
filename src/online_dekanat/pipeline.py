@@ -5,7 +5,7 @@ import os
 
 from online_dekanat.answering import answer_question
 from online_dekanat.config import load_document_types, load_regulations, DEFAULT_CONFIG_DIR
-from online_dekanat.extraction import extract_card
+from online_dekanat.extraction import classify_document, extract_card
 from online_dekanat.highlight import apply_visual_presence, create_highlights
 from online_dekanat.models import PipelineResult
 from online_dekanat.ocr.base import OCRClient
@@ -49,7 +49,12 @@ class DeanOfficePipeline:
                 finally:
                     if ocr_path != visual_path:
                         ocr_path.unlink(missing_ok=True)
-                card = extract_card(ocr_result.text, self.document_types, doc_type=doc_type)
+                selected_type = doc_type or classify_document(
+                    ocr_result.text, self.document_types
+                )
+                card = extract_card(
+                    ocr_result.text, self.document_types, doc_type=selected_type
+                )
                 apply_visual_presence(visual_path, regions, card)
                 highlights = create_highlights(visual_path, regions, card)
             finally:

@@ -1781,5 +1781,1633 @@
         }
       ]
     }
+  },
+  {
+    "result_id": "cf39a1d503e0b41237e1",
+    "processed_at": "2026-10-15T18:01:54.177044+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "warning",
+      "score": 0.7,
+      "issues": [
+        "overexposed",
+        "low_contrast"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 905,
+          "height": 1280,
+          "brightness": 251.27,
+          "contrast": 17.65,
+          "sharpness": 453.48
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "ff84a36e2081e6bf39f8",
+    "processed_at": "2026-10-15T18:27:33.909524+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "warning",
+      "score": 0.7,
+      "issues": [
+        "overexposed",
+        "low_contrast"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 905,
+          "height": 1280,
+          "brightness": 251.27,
+          "contrast": 17.65,
+          "sharpness": 453.48
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "0b532abf8598e8d7e0d6",
+    "processed_at": "2026-10-15T18:27:56.403673+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "7cf0ed49eff1bc9bccc5",
+    "processed_at": "2026-10-15T18:28:03.724292+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1600,
+          "height": 1132,
+          "brightness": 251.35,
+          "contrast": 25.05,
+          "sharpness": 1407.74
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "be4376d5727973b5638b",
+    "processed_at": "2026-10-15T20:02:51.266178+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "warning",
+      "score": 0.7,
+      "issues": [
+        "overexposed",
+        "low_contrast"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 905,
+          "height": 1280,
+          "brightness": 251.27,
+          "contrast": 17.65,
+          "sharpness": 453.48
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "f95d1f8bae64ea4fd002",
+    "processed_at": "2026-10-15T20:03:10.524667+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Справка содержит все данные, которые требует п. 3.2 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {
+      "status": "warning",
+      "score": 0.7,
+      "issues": [
+        "overexposed",
+        "low_contrast"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 905,
+          "height": 1280,
+          "brightness": 251.27,
+          "contrast": 17.65,
+          "sharpness": 453.48
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d19390a904ae999bf983",
+    "processed_at": "2026-10-15T20:04:18.897803+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата заявления. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата заявления"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1132,
+          "height": 1600,
+          "brightness": 251.79,
+          "contrast": 23.81,
+          "sharpness": 1228.83
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "116e7ae867bcc4e598a1",
+    "processed_at": "2026-10-15T20:05:38.900762+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Подпись студента. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Подпись студента"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.58,
+          "sharpness": 976.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "725a76a24e0d2a7b4e95",
+    "processed_at": "2026-10-15T20:05:54.765865+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "Не хватает: Дата заявления. Эти поля обязательны по п. 4.1 Положения. Окончательное решение примет сотрудник деканата.",
+    "confidence": "rule-based",
+    "missing_fields": [
+      "Дата заявления"
+    ],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c194a535d3753742ce58",
+    "processed_at": "2026-10-15T20:06:11.900566+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "679f8d0b51efd72bc911",
+    "processed_at": "2026-10-15T20:06:21.776357+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.08,
+          "contrast": 26.62,
+          "sharpness": 1178.57
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "b6af93768cfd3a8bc60a",
+    "processed_at": "2026-10-15T20:06:32.865303+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.5,
+          "contrast": 25.12,
+          "sharpness": 1081.21
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "bb52379a3b8ce23e4814",
+    "processed_at": "2026-10-15T20:06:46.858487+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.32,
+          "contrast": 26.0,
+          "sharpness": 1126.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "7725f06d76111c967a10",
+    "processed_at": "2026-10-15T20:07:01.214493+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.32,
+          "contrast": 25.72,
+          "sharpness": 1120.94
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "419afdf6234f940af073",
+    "processed_at": "2026-10-15T20:07:15.701699+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.45,
+          "sharpness": 1098.28
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "6e1c442877f373fdd7c4",
+    "processed_at": "2026-10-15T20:07:32.803170+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.45,
+          "sharpness": 1098.28
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c6a498240ceed3dda44c",
+    "processed_at": "2026-10-15T20:07:41.790407+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.45,
+          "sharpness": 1098.61
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c373bb40041aafbccdb3",
+    "processed_at": "2026-10-15T20:08:39.714284+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.17,
+          "contrast": 26.29,
+          "sharpness": 1150.57
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "a012099ab8134307d233",
+    "processed_at": "2026-10-15T20:08:51.856818+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.63,
+          "sharpness": 1107.62
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "b7a620ed8ebac2ee5742",
+    "processed_at": "2026-10-15T20:09:04.359275+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.79,
+          "sharpness": 1056.1
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "69648e3df1593a8edc47",
+    "processed_at": "2026-10-15T20:15:11.332952+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.63,
+          "sharpness": 1107.62
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "7309f299938884d2f0fe",
+    "processed_at": "2026-10-15T20:15:20.359519+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.79,
+          "sharpness": 1056.1
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "361e7a16231dd46ad617",
+    "processed_at": "2026-10-15T20:17:21.297364+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.65,
+          "contrast": 24.86,
+          "sharpness": 981.03
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "0d681edd0de8ebbfda74",
+    "processed_at": "2026-10-15T20:17:33.459615+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "1ea3cd8af6ffb5a5a07c",
+    "processed_at": "2026-10-15T20:17:43.720348+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.58,
+          "sharpness": 976.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "6cae91b9fa205f065f61",
+    "processed_at": "2026-10-15T20:17:56.033221+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.87,
+          "contrast": 24.02,
+          "sharpness": 929.35
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "10e2cfd1daa390360931",
+    "processed_at": "2026-10-15T20:19:27.286617+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.67,
+          "contrast": 24.8,
+          "sharpness": 983.16
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "6bee6d55dc574deef7de",
+    "processed_at": "2026-10-15T20:20:00.629611+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.67,
+          "contrast": 24.76,
+          "sharpness": 985.8
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "9090fb71c09db2745d8e",
+    "processed_at": "2026-10-15T20:20:13.632584+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.7,
+          "contrast": 24.68,
+          "sharpness": 974.6
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "ed5ca3b0c353ff0b8c6d",
+    "processed_at": "2026-10-15T20:22:25.492313+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.51,
+          "sharpness": 958.73
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "ccf44e545d3c06d60beb",
+    "processed_at": "2026-10-15T20:22:48.835033+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.51,
+          "sharpness": 958.73
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "a80e3a88ed3c47303047",
+    "processed_at": "2026-10-15T20:23:38.012375+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.7,
+          "contrast": 24.69,
+          "sharpness": 973.84
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "85b1ed1ee20bc9fd9fa4",
+    "processed_at": "2026-10-15T20:24:47.480426+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.71,
+          "contrast": 24.62,
+          "sharpness": 974.97
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "f8625d7f595b62c15de1",
+    "processed_at": "2026-10-15T20:25:00.897479+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.63,
+          "sharpness": 1108.99
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "1477c467b4425a87893e",
+    "processed_at": "2026-10-15T20:25:17.741738+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.32,
+          "contrast": 25.76,
+          "sharpness": 1125.84
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "315ae611d1bc56751f79",
+    "processed_at": "2026-10-15T20:25:30.634789+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.54,
+          "contrast": 24.95,
+          "sharpness": 1077.06
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d69a192a82efc7235bdc",
+    "processed_at": "2026-10-15T20:25:42.880598+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.63,
+          "contrast": 24.86,
+          "sharpness": 1051.55
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c4b91a3c6e55f5621c7b",
+    "processed_at": "2026-10-15T20:25:57.746819+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.44,
+          "sharpness": 1106.61
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "e3613b89db0b07dfb39e",
+    "processed_at": "2026-10-15T20:26:12.541923+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1116.3
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "89c2cbe326e2d0bd1a7d",
+    "processed_at": "2026-10-15T20:27:18.196584+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.48,
+          "contrast": 25.15,
+          "sharpness": 1085.73
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d368ded8b9429a002fc8",
+    "processed_at": "2026-10-15T20:28:06.139122+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.3,
+          "contrast": 25.81,
+          "sharpness": 1125.48
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "5da4a21b23dc920323ca",
+    "processed_at": "2026-10-15T20:28:17.721380+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.41,
+          "contrast": 25.4,
+          "sharpness": 1095.19
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "58db5043543324b9d7b2",
+    "processed_at": "2026-10-15T20:28:36.352988+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.75,
+          "contrast": 24.4,
+          "sharpness": 1035.65
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d136e64e0d96511fda8a",
+    "processed_at": "2026-10-15T20:29:18.232671+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1103.96
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "fe0ca7a3c801d3b050e6",
+    "processed_at": "2026-10-15T20:59:49.076208+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.79,
+          "contrast": 24.32,
+          "sharpness": 950.27
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c6b441b95e2d7ed5bb57",
+    "processed_at": "2026-10-15T21:00:10.088071+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.4,
+          "contrast": 25.45,
+          "sharpness": 1098.61
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "3f90a72efe3f481d446d",
+    "processed_at": "2026-10-15T21:01:28.542707+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.87,
+          "contrast": 24.02,
+          "sharpness": 929.35
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "adfb8a8337c1c93a7ea2",
+    "processed_at": "2026-10-15T21:02:32.185327+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.67,
+          "contrast": 24.8,
+          "sharpness": 983.16
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "cc429fe2dee231de305c",
+    "processed_at": "2026-10-15T21:02:53.745321+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.7,
+          "contrast": 24.68,
+          "sharpness": 974.6
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "c603fb57db3cd22eed20",
+    "processed_at": "2026-10-15T21:03:15.345088+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.74,
+          "contrast": 24.51,
+          "sharpness": 958.73
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "ed2423fee18311b8f7fc",
+    "processed_at": "2026-10-15T21:03:49.616906+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.7,
+          "contrast": 24.68,
+          "sharpness": 974.6
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "beb3fb185ac561ee1df9",
+    "processed_at": "2026-10-15T21:04:06.552011+00:00",
+    "document_type": "academic_leave_application",
+    "document_label": "Заявление на академический отпуск",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.7,
+          "contrast": 24.69,
+          "sharpness": 973.84
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "d1b533d4d197c6c01ac5",
+    "processed_at": "2026-10-15T21:04:33.696268+00:00",
+    "document_type": "practice_certificate",
+    "document_label": "Справка о практике",
+    "answer": "В документе и в Положении нет достаточных данных для ответа. Обратитесь в деканат.",
+    "confidence": "no-answer",
+    "missing_fields": [],
+    "quality": {
+      "status": "good",
+      "score": 0.85,
+      "issues": [
+        "overexposed"
+      ],
+      "pages": 1,
+      "page_metrics": [
+        {
+          "width": 1489,
+          "height": 2105,
+          "brightness": 251.35,
+          "contrast": 25.62,
+          "sharpness": 1116.3
+        }
+      ]
+    }
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:07:23.316625+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:07:23.326503+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:07:56.813265+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:07:56.833963+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:22:32.406719+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:22:32.413290+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:31:34.813252+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:31:34.829621+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:31:56.714104+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:31:56.730292+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:37:22.940974+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:37:22.957225+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:39:30.258622+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:39:30.273942+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:43:11.157991+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:43:11.168713+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:44:02.089154+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:44:02.101454+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:44:28.388434+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:44:28.403308+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:48:16.404893+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:48:16.419511+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:48:44.815110+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Какая дата выдачи?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
+  },
+  {
+    "result_id": "test-result",
+    "processed_at": "2026-10-15T21:48:44.829757+00:00",
+    "document_type": "study_certificate",
+    "document_label": "Справка об обучении",
+    "answer": "Сколько стоит общежитие?",
+    "confidence": "rule-based",
+    "missing_fields": [],
+    "quality": {}
   }
 ]

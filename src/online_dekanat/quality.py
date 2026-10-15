@@ -114,28 +114,13 @@ def _page_rotation(page: Image.Image, pytesseract: Any) -> int:
         osd = ""
     rotate_match = re.search(r"^Rotate:\s*(\d+)", osd, re.MULTILINE)
     confidence_match = re.search(r"^Orientation confidence:\s*([\d.]+)", osd, re.MULTILINE)
-    if rotate_match and confidence_match and float(confidence_match.group(1)) >= 5:
-        return (-int(rotate_match.group(1))) % 360
-
-    scores: dict[int, float] = {}
-    for rotation in (0, 90, 180, 270):
-        candidate = analysis_page.rotate(rotation, expand=True) if rotation else analysis_page
-        data = pytesseract.image_to_data(
-            candidate,
-            lang="rus+eng",
-            config="--psm 6",
-            output_type=pytesseract.Output.DICT,
-        )
-        scores[rotation] = sum(
-            float(confidence)
-            for confidence in data["conf"]
-            if confidence != "-1" and float(confidence) > 0
-        )
-
-    best_rotation = max(scores, key=scores.get)
-    if best_rotation and scores[best_rotation] > scores[0] * 1.25:
-        return best_rotation
-    return 0
+    if not rotate_match or not confidence_match:
+        logger.warning("Skipping automatic page orientation: Tesseract could not determine the orientation.")
+        return 0
+    if float(confidence_match.group(1)) < 5:
+        logger.info("Skipping automatic page orientation: Tesseract orientation confidence is too low.")
+        return 0
+    return (-int(rotate_match.group(1))) % 360
 
 
 def prepare_for_ocr(path: str | Path, quality: dict[str, Any]) -> Path:
