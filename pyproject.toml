@@ -37,3 +37,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.vercel]
+entrypoint = "src.online_dekanat.api:app"
