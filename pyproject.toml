@@ -39,8 +39,4 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 
 [tool.vercel]
-<<<<<<< HEAD
 entrypoint = "src.online_dekanat.api:app"
-=======
-entrypoint = "src.online_dekanat.api:app"
->>>>>>> 85b714b3df040e08ab4c7e3eca12c55328bcbb72
